@@ -15,7 +15,6 @@ const tabs = [
 export class BusinessPage extends BasePage {
     constructor(props) {
         super(props, {
-            showType: 0,
             sellOrders: [],
             buyOrders: [],
         });
@@ -26,15 +25,15 @@ export class BusinessPage extends BasePage {
             <div>
                 <Tabs tabs={tabs}
                       initialPage={0}
-                      onChange={(tab, index) => {  this.setState({showType: tab.showType}) }}
-                      onTabClick={(tab, index) => { this.setState({showType: tab.showType}) }}
+                      onChange={(tab, index) => {}}
+                      onTabClick={(tab, index) => {}}
 
                 >
                     <div style={{    overflowX: 'hidden',borderBottom:""}}>
-                        <Placeorder pk={this.state.pk} orderType={this.state.showType}/>
+                        <Placeorder pk={this.state.pk} orderType={0}/>
                     </div>
                     <div style={{    overflowX: 'hidden'}}>
-                        <Placeorder pk={this.state.pk} orderType={this.state.showType}/>
+                        <Placeorder pk={this.state.pk} orderType={1}/>
                     </div>
                     <div style={{    overflowX: 'hidden'}}>
                         <MyOrders pk={this.state.pk}/>

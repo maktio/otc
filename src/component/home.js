@@ -90,7 +90,7 @@ export class Otc extends Component {
                     mode="light"
                     rightContent={[
                         <Icon key="1" type="iconaccount" className="text-black" onClick={this.changAccount.bind(this)}/>,
-                        <span>{this.state.name}</span>
+                        <span key="2">{this.state.name}</span>
                     ]}
                 >
                     <SegmentedControl

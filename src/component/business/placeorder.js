@@ -31,17 +31,25 @@ export class Placeorder extends BasePage {
         }
     }
 
-    init(mainPKr, token) {
+    init(mainPKr, token, unit) {
+        if (!mainPKr) {
+            mainPKr = this.state.mainPKr;
+        }
         if (!token) {
             token = this.state.token;
+        }
+        if (unit == undefined) {
+            unit = this.state.unit;
         }
         if (!token) {
             return;
         }
+
         let self = this;
         oAbi.init
             .then(() => {
-                oAbi.businessOrders(this.state.mainPKr, token, this.state.unit, false, function (orders) {
+                console.log("businessOrders", unit);
+                oAbi.businessOrders(mainPKr, token, unit, false, function (orders) {
                     let sellOrders = [];
                     let buyOrders = [];
 
@@ -76,7 +84,7 @@ export class Placeorder extends BasePage {
         let orders = showOrders.map((item, index) => {
             return <List.Item key={index}>
                 <Flex style={{fontSize:"12px",fontWeight:"800"}}>
-                    <Flex.Item>{showValue(item.order.price, 9, 4)} CNY</Flex.Item>
+                    <Flex.Item>{showValue(item.order.price, 9, 4)}</Flex.Item>
                     <Flex.Item>{showValue(item.order.value - item.order.dealtValue - item.order.lockinValue, 18, 4)}</Flex.Item>
                     <Flex.Item>{showValue(item.order.minDealValue, 18, 4)}-{showValue(item.order.maxDealValue, 18, 4)}</Flex.Item>
                 </Flex>
@@ -92,9 +100,45 @@ export class Placeorder extends BasePage {
         });
         return (
             <div className="ui bottom attached segment">
-                <div className="ui small horizontal divided list">
-                    {tabList}
+
+                <div className="ui grid">
+                    <div className="four wide column">
+                        <div className="ui dropdown" ref={el => this.dropdown = el}
+                             onClick={() => {
+                                 this.setState({showSelect: true});
+                                 this.dropdown.className = "ui dropdown active visible";
+                                 this.menu.className = "menu transition visible";
+                             }}>
+                            <div className="text">{oAbi.unitName(this.state.unit)}</div>
+                            <i className="dropdown icon"></i>
+                            <div className="menu transition hidden" ref={el => this.menu = el}>
+                                <div className="item" onClick={(e) => {
+                                    this.dropdown.className = "ui dropdown ";
+                                    this.menu.className = "menu transition hidden";
+                                    this.setState({unit: 0, showSelect: false});
+                                    this.init(this.state.mainPKr, null, 0);
+                                    e.stopPropagation()
+                                }}>CNY
+                                </div>
+                                <div className="item" onClick={(e) => {
+                                    this.dropdown.className = "ui dropdown ";
+                                    this.menu.className = "menu transition hidden";
+                                    this.setState({unit: 1, showSelect: false});
+                                    this.init(this.state.mainPKr, null, 1);
+                                    e.stopPropagation()
+                                }}>USD
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div className="twelve wide column">
+                        <div className="ui small horizontal divided list">
+                            {tabList}
+                        </div>
+                    </div>
                 </div>
+
                 <WhiteSpace/>
                 <div className="ui icon input" style={{width: "100%"}}>
                     <input disabled={true} type="text" placeholder="Price" ref={el => this.priceValue = el}
@@ -106,7 +150,7 @@ export class Placeorder extends BasePage {
                                }
                                // this.priceValue.value = value;
                            }}/>
-                    <i className="icon" style={{top: '12px',color:"#000"}}>CNY</i>
+                    <i className="icon" style={{top: '12px',color:"#000"}}>{oAbi.unitName(this.state.unit)}</i>
                 </div>
                 <WhiteSpace/>
                 <div className="ui icon input" style={{width: "100%"}}>

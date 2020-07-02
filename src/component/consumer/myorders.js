@@ -29,6 +29,7 @@ export class MyOrders extends BasePage {
         if (!mainPKr) {
             mainPKr = this.state.mainPKr;
         }
+        console.log("init myorder")
         oAbi.userOrders(mainPKr, true, function (orders) {
             orders.sort(function (a, b) {
                 return b.order.updateTime - a.order.updateTime;

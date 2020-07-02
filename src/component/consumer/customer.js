@@ -13,25 +13,22 @@ const tabs = [
 
 export class CustomerPag extends BasePage {
     constructor(props) {
-        super(props, {
-            orderType: 1,
-        });
+        super(props,{});
     }
 
     render() {
         return (
             <div>
-
                 <Tabs tabs={tabs}
                       initialPage={0}
-                      onChange={(tab, index) => {  this.setState({orderType: tab.orderType}) }}
-                      onTabClick={(tab, index) => { this.setState({orderType: tab.orderType}) }}
+                      onChange={(tab, index) => { }}
+                      onTabClick={(tab, index) => { }}
                 >
                     <div>
-                        <MarketOrders pk={this.state.pk} orderType={this.state.orderType}/>
+                        <MarketOrders pk={this.state.pk} orderType={1}/>
                     </div>
-                    <div >
-                        <MarketOrders pk={this.state.pk} orderType={this.state.orderType}/>
+                    <div>
+                        <MarketOrders pk={this.state.pk} orderType={0}/>
                     </div>
                     <div>
                         <MyOrders pk={this.state.pk}/>

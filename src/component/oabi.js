@@ -21,7 +21,7 @@ const contract = serojs.callContract(abiJson, "5Yc7VZw2nSoFxkMgKQSqhiD6HNGHsFmxt
 
 const rpc = new JsonRpc();
 
-const unitMap = new Map([["SCNY",0],["SUSD",1]]);
+const unitMap = new Map([[0, "CNY"],[1,"USD"]]);
 
 class OAbi {
 
@@ -40,8 +40,8 @@ class OAbi {
         )
     }
 
-    unit(name) {
-        return unitMap.get(name);
+    unitName(unit) {
+        return unitMap.get(unit);
     }
 
     tokenList() {
