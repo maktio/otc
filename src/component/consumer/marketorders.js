@@ -102,11 +102,10 @@ export class MarketOrders extends BasePage {
             orders = this.state.sellOrders;
         }
 
-
         let showOrders = orders.map((item, index) => {
             let value = item.order.value - item.order.dealtValue - item.order.lockinValue;
             return (
-                <List.Item key={index}>
+                <div className="item" key={index}>
                     <Card>
                         <Card.Header
                             title={item.name}
@@ -132,18 +131,6 @@ export class MarketOrders extends BasePage {
                                         if (!this.state.ecode) {
                                             this.kyc();
                                         } else {
-                                            // <div className="ui input"><input type="text" placeholder="amount"
-                                            //                                  onChange={(event) => {
-                                            //                                      let value = event.target.value;
-                                            //                                      if (value) {
-                                            //                                          value = (value.match(/^\d*(\.?\d{0,4})/g)[0]) || null
-                                            //                                      }
-                                            //                                      this.amountValue.value = value;
-                                            //                                  }}
-                                            //                                  ref={el => this.amountValue = el}/>
-
-                                            // </div>
-
                                             let options = values.map((value, index) => {
                                                 if (new BigNumber(value).multipliedBy(new BigNumber(10).pow(18)).comparedTo(new BigNumber(item.order.value - item.order.dealtValue)) <= 0) {
                                                     return (
@@ -192,17 +179,15 @@ export class MarketOrders extends BasePage {
                             </Button>
                         }/>
                     </Card>
-                </List.Item>
+                </div>
             )
         });
 
         return (
-
             <div>
                 <WhiteSpace/>
-
-                <div className="ui grid">
-                    <div className="four wide column">
+                <div className="ui breadcrumb">
+                    <div className="section">
                         <div className="ui dropdown" ref={el => this.dropdown = el}
                              onClick={() => {
                                  this.setState({showSelect: true});
@@ -230,23 +215,24 @@ export class MarketOrders extends BasePage {
                                 </div>
                             </div>
                         </div>
-
                     </div>
-                    <div className="twelve wide column">
+                    <div className="divider">&nbsp;&nbsp;&nbsp;&nbsp;|</div>
+                    <div className="section">
                         <div className="ui small horizontal divided list">
                             {tabList}
                         </div>
                     </div>
                 </div>
 
-
-                <List renderHeader={() => '市场挂单'}>
-                    {orders.length > 0 ? showOrders : <List.Item>
-                        <div style={{textAlign: 'center'}}>
-                            <Icon type="iconnodata-topic" style={{width: "100px", height: "100px"}}/>
-                        </div>
-                    </List.Item>}
-                </List>
+                <h4 className="ui dividing header">
+                    市场挂单
+                </h4>
+                {orders.length > 0 ?
+                    <div className="ui list">{showOrders}</div> :
+                    <div style={{textAlign: 'center'}}>
+                        <Icon type="iconnodata-topic" style={{width: "100px", height: "100px"}}/>
+                    </div>
+                }
             </div>
         )
     }

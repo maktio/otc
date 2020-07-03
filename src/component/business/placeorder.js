@@ -99,8 +99,7 @@ export class Placeorder extends BasePage {
             </div>
         });
         return (
-            <div className="ui bottom attached segment">
-
+            <div className="ui segment">
                 <div className="ui grid">
                     <div className="four wide column">
                         <div className="ui dropdown" ref={el => this.dropdown = el}

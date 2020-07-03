@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Modal, Flex, List, WhiteSpace, WingBlank, Icon} from "antd-mobile";
+import {Modal, Flex, List, WhiteSpace, WingBlank, Icon, Card} from "antd-mobile";
 import 'semantic-ui-css/semantic.min.css';
 import oAbi from '../oabi'
 import {bytes32ToToken, formatDate, showValue} from "../common";
@@ -89,21 +89,31 @@ export class MyOrders extends BasePage {
             </span>
             return <div className="item" key={index}>
                 <WhiteSpace/>
-                <div>
-                    <Flex>
-                        <Flex.Item
-                            style={{flex: 2}}>{item.order.orderType == 0 ? language.e().order.buy : language.e().order.sell} {bytes32ToToken(item.order.token)}</Flex.Item>
-                        <Flex.Item style={{flex: 1}}>ID: {item.id}</Flex.Item>
-                        <Flex.Item style={{flex: 3, textAlign: 'right'}}>{status}</Flex.Item>
-                    </Flex>
-                </div>
-                <WhiteSpace/>
-                <div>
-                    <Flex>
-                        <Flex.Item>{showValue(item.order.price, 9, 4)}CNY</Flex.Item>
-                        <Flex.Item>
-                            {item.order.status == 2 &&
-                            <span>
+                <Card>
+                    <Card.Header
+                        title={
+                            <span>{item.order.orderType == 0 ? language.e().order.buy : language.e().order.sell} {bytes32ToToken(item.order.token)}</span>}
+                        extra={<div><span style={{float:'left'}}>ID: {item.id}</span>&nbsp;&nbsp;&nbsp;<span style={{textAlign: 'right'}}>{status}</span></div>}
+                    />
+                    <Card.Body>
+                        <Flex>
+                            <Flex.Item style={{flex: 2}}>
+                                <div>{language.e().order.time}</div>
+                                <div>{formatDate(new Date(item.order.updateTime * 1000))}</div>
+                            </Flex.Item>
+                            <Flex.Item style={{flex: 1}}>
+                                <div>{language.e().order.price}</div>
+                                <div>{showValue(item.order.price, 9, 4)}</div>
+                            </Flex.Item>
+                            <Flex.Item style={{flex: 1, textAlign: 'right'}}>
+                                <div>{language.e().order.amount}</div>
+                                <div>{showValue(item.order.value, 18, 4)}</div>
+                            </Flex.Item>
+                        </Flex>
+                    </Card.Body>
+                    <Card.Footer extra={<div>
+                        {item.order.status == 2 &&
+                        <span>
                                 <a onClick={() => {
                                     alert('KYC', <span>{item.hcode}, {item.ecode}</span>, [
                                         {text: language.e().modal.cancel, onPress: () => console.log('cancel')},
@@ -112,40 +122,22 @@ export class MyOrders extends BasePage {
                                 }
                                 }>KYC</a> |
                             </span>
-                            }
-                            <a onClick={() => {
-                                alert(language.e().order.tips8, <span>{item.hcode}</span>, [
-                                    {text: language.e().modal.cancel, onPress: () => console.log('cancel')},
-                                    {text: language.e().modal.ok, onPress: () => console.log('ok')},
-                                ])
-                            }}>{language.e().order.tips8}</a></Flex.Item>
-                    </Flex>
-                </div>
-                <WhiteSpace/>
-                <div>
-                    <Flex>
-                        <Flex.Item style={{flex: 2}}>
-                            <div>{language.e().order.time}</div>
-                            <div>{formatDate(new Date(item.order.updateTime * 1000))}</div>
-                        </Flex.Item>
-                        <Flex.Item style={{flex: 1}}>
-                            <div>{language.e().order.price}</div>
-                            <div>{showValue(item.order.price, 9, 4)}</div>
-                        </Flex.Item>
-                        <Flex.Item style={{flex: 1, textAlign: 'right'}}>
-                            <div>{language.e().order.amount}</div>
-                            <div>{showValue(item.order.value, 18, 4)}</div>
-                        </Flex.Item>
-                    </Flex>
-                </div>
+                        }
+                        <a onClick={() => {
+                            alert(language.e().order.tips8, <span>{item.hcode}</span>, [
+                                {text: language.e().modal.cancel, onPress: () => console.log('cancel')},
+                                {text: language.e().modal.ok, onPress: () => console.log('ok')},
+                            ])
+                        }}>{language.e().order.tips8}</a>
+                    </div>}/>
+                </Card>
             </div>
         });
         return (
-            <div className="ui divided list">{showOrders&&showOrders.length>0?showOrders:<List.Item>
+            <div className="ui list">{showOrders&&showOrders.length>0?showOrders:
                 <div style={{textAlign:'center'}}>
                     <Icon type="iconnodata-topic" style={{width:"100px",height:"100px"}}/>
-                </div>
-            </List.Item>}</div>
+                </div>}</div>
         )
     }
 }

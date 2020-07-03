@@ -90,8 +90,7 @@ export class MyOrders extends BasePage {
                 status = item.order.status == 4 ? "已取消" : "已完成";
             }
 
-            //<Badge text={'3'}
-            return <List.Item key={index}>
+            return <div className="item" key={index}>
                 <Flex style={{fontSize: '12px'}}>
                     <Flex.Item
                         style={{flex: 1}}>{item.id}</Flex.Item>
@@ -99,7 +98,6 @@ export class MyOrders extends BasePage {
                         style={{flex: 2}}>{item.order.orderType == 0 ? language.e().order.buy : language.e().order.sell}{bytes32ToToken(item.order.token)}</Flex.Item>
                     <Flex.Item style={{flex: 1}}>{showValue(item.order.price, 9, 4)}</Flex.Item>
                     <Flex.Item style={{flex: 1}}>{showValue(item.order.value, 18, 4)}</Flex.Item>
-                    <Flex.Item style={{flex: 1}}>{num}</Flex.Item>
                     <Flex.Item style={{flex: 1}}>
                         {
                             canCancel ? <a onClick={() => {
@@ -115,19 +113,20 @@ export class MyOrders extends BasePage {
                             }>撤消</a> : status
                         }
                     </Flex.Item>
+                    <Flex.Item style={{flex: 1}}>{num}</Flex.Item>
                     <Flex.Item style={{flex: 1, textAlign: 'right'}}><a onClick={() => {
                         self.setState({order: item});
                     }}><Icon type="right"/></a></Flex.Item>
                 </Flex>
-            </List.Item>
+            </div>
         });
 
         return (
-            <div className="ui bottom attached segment">
+            <div className="ui segment">
                 {
                     this.state.order != null ? <UserOrders order={this.state.order} back={this.back.bind(this)}/> :
-                        <div>
-                            <List renderHeader={
+                        <div className="ui list">
+                            <div className="item">
                                 <Flex style={{fontSize: '12px', fontWeight: 'bold'}}>
                                     <Flex.Item
                                         style={{flex: 1}}>ID</Flex.Item>
@@ -135,20 +134,18 @@ export class MyOrders extends BasePage {
                                         style={{flex: 2}}>{language.e().order.orderType}</Flex.Item>
                                     <Flex.Item style={{flex: 1}}>{language.e().order.price}</Flex.Item>
                                     <Flex.Item style={{flex: 1}}>{language.e().order.amount}</Flex.Item>
-                                    <Flex.Item style={{flex: 1}}>处理中</Flex.Item>
-                                    <Flex.Item style={{flex: 1}}>操作</Flex.Item>
+                                    <Flex.Item style={{flex: 1}}>状态</Flex.Item>
+                                    <Flex.Item style={{flex: 1}}>交易</Flex.Item>
                                     <Flex.Item style={{flex: 1}}></Flex.Item>
                                 </Flex>
-                            }>
-                                {orders&&orders.length>0?orders:<List.Item>
-                                    <div style={{textAlign:'center'}}>
-                                        <Icon type="iconnodata-topic" style={{width:"100px",height:"100px"}}/>
+                            </div>
+                            {
+                                orders && orders.length > 0 ? orders :
+                                    <div className="item" style={{textAlign: 'center'}}>
+                                        <Icon type="iconnodata-topic" style={{width: "100px", height: "100px"}}/>
                                     </div>
-                                </List.Item>}
-
-                            </List>
+                            }
                         </div>
-
                 }
             </div>
         )

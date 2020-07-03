@@ -65,7 +65,7 @@ class Language {
             confirm:"确认",
             refuse:"拒绝",
             pass:"放行",
-            tips1:"待确认,请联系商家确认订单",
+            tips1:"待确认",
             tips2_0:"待付款",
             tips2_1:"应收",
             tips2_3:"请确认已收款！",
