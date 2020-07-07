@@ -17,6 +17,13 @@ object-assign
  * @license  MIT
  */
 
+/*!
+ * cookie
+ * Copyright(c) 2012-2014 Roman Shtylman
+ * Copyright(c) 2015 Douglas Christopher Wilson
+ * MIT Licensed
+ */
+
 /*! bignumber.js v2.0.7 https://github.com/MikeMcl/bignumber.js/LICENCE */
 
 /*! https://mths.be/utf8js v2.1.2 by @mathias */

@@ -5,6 +5,7 @@ import {Brief, Button, Card, Flex, Icon, List, Modal, Radio, WhiteSpace} from "a
 import {bytes32ToToken, randomByte32, showValue, formatDate} from "../common";
 import BigNumber from 'bignumber.js'
 import language from '../language'
+import Iframe from "react-iframe";
 
 const alert = Modal.alert;
 
@@ -19,6 +20,7 @@ export class UserOrders extends Component {
 
     render() {
         let self = this;
+        let code = this.props.code;
         let childs = this.props.order.childs.sort(function (a, b) {
             return b.order.updateTime - a.order.updateTime;
         });
@@ -51,7 +53,9 @@ export class UserOrders extends Component {
                                 {
                                     text: language.e().modal.ok, onPress: () => {
                                         if (this.conform.checked) {
-                                            oAbi.confirmed(self.state.pk, self.state.mainPKr, child.id, randomByte32());
+                                            oAbi.pkrEncrypt(child.pkr, oAbi.code1(code), function (mcode) {
+                                                oAbi.confirmed(self.state.pk, self.state.mainPKr, child.id, mcode);
+                                            });
                                         } else {
                                             oAbi.refused(self.state.pk, self.state.mainPKr, child.id);
                                         }
@@ -143,11 +147,18 @@ export class UserOrders extends Component {
                     </Card.Body>
                     <Card.Footer content={formatDate(new Date(child.order.updateTime * 1000))} extra={<span>
                         <a onClick={() => {
-                            alert('KYC', <span>{child.hcode}, {child.ecode}</span>, [
-                                {text: language.e().modal.cancel, onPress: () => console.log('cancel')},
-                                {text: language.e().modal.ok, onPress: () => console.log('ok')},
-                            ])
-                        }}>KYC</a>
+                            console.log("child.mcode",child.mcode);
+                            oAbi.pkrDecrypt(self.state.pk, child.mcode, function (code1) {
+                                if (oAbi.code2(code1) === child.hcode) {
+                                    let url = "https://ahoj.xyz/level/code1/" + code1 + "?lang=cn";
+                                    Modal.alert('', <Iframe url={url}
+                                                            width="100%"
+                                                            height="450px"
+                                                            display="initial"
+                                                            position="relative"/>);
+                                }
+                            });
+                        }}>支付信息</a>
                     </span>}/>
                 </Card>
                 <WhiteSpace size="sm"/>

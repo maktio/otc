@@ -100,8 +100,8 @@ export class Placeorder extends BasePage {
         });
         return (
             <div className="ui segment">
-                <div className="ui grid">
-                    <div className="four wide column">
+                <div className="ui breadcrumb">
+                    <div className="section">
                         <div className="ui dropdown" ref={el => this.dropdown = el}
                              onClick={() => {
                                  this.setState({showSelect: true});
@@ -124,14 +124,14 @@ export class Placeorder extends BasePage {
                                     this.menu.className = "menu transition hidden";
                                     this.setState({unit: 1, showSelect: false});
                                     this.init(this.state.mainPKr, null, 1);
-                                    e.stopPropagation()
+                                    e.stopPropagation();
                                 }}>USD
                                 </div>
                             </div>
                         </div>
-
                     </div>
-                    <div className="twelve wide column">
+                    <div className="divider">&nbsp;&nbsp;&nbsp;&nbsp;</div>
+                    <div className="section">
                         <div className="ui small horizontal divided list">
                             {tabList}
                         </div>
@@ -199,7 +199,7 @@ export class Placeorder extends BasePage {
                 <Flex>
                     <Flex.Item>
                         <Button type={orderType == 0?"primary":"warning"} onClick={() => {
-                            if (!this.state.hasAudited) {
+                            if (this.state.auditedStatus != 2) {
                                 this.kyc(true);
                             } else {
                                 if (!this.countValue.value) {

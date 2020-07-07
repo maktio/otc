@@ -58,3 +58,7 @@
   font-size: 17px;
   color: #888;
 }
+
+.am-modal-transparent {
+  width: unset !important;
+}

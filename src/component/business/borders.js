@@ -10,20 +10,48 @@ import {UserOrders} from "./userorders";
 
 const alert = Modal.alert;
 
-export class MyOrders extends BasePage {
+export class BOrders extends Component {
     constructor(props) {
-        super(props, {
+        super(props);
+        this.state = {
+            pk: this.props.pk,
             orders: [],
             order: null
-        });
+        }
     }
 
-    _componentDidMount(mainPKr) {
+    componentWillReceiveProps(nextProps) {
         let self = this;
-        self.init(mainPKr);
-        self.timer = setInterval(function () {
-            self.init();
-        }, 10 * 1000);
+        if (nextProps.pk != this.props.pk) {
+            oAbi.accountDetails(nextProps.pk, function (account) {
+                oAbi.myKyc(account.pk, account.mainPKr, function (code) {
+                    self.setState({pk: nextProps.pk, mainPKr: account.mainPKr, code: code});
+                    self.init(account.mainPKr);
+                })
+            });
+        }
+    }
+
+    componentDidMount() {
+        let self = this;
+        oAbi.init
+            .then(() => {
+                oAbi.accountDetails(this.state.pk, function (account) {
+                    oAbi.myKyc(account.pk, account.mainPKr, function (code) {
+                        self.setState({pk: account.pk, mainPKr: account.mainPKr, code: code});
+                        self.init(account.mainPKr);
+                        self.timer = setInterval(function () {
+                            self.init();
+                        }, 10 * 1000);
+                    });
+                });
+            });
+    }
+
+    componentWillUnmount() {
+        if (this.timer) {
+            clearInterval(this.timer);
+        }
     }
 
     init(mainPKr) {
@@ -96,7 +124,7 @@ export class MyOrders extends BasePage {
                         style={{flex: 1}}>{item.id}</Flex.Item>
                     <Flex.Item
                         style={{flex: 2}}>{item.order.orderType == 0 ? language.e().order.buy : language.e().order.sell}{bytes32ToToken(item.order.token)}</Flex.Item>
-                    <Flex.Item style={{flex: 1}}>{showValue(item.order.price, 9, 4)}</Flex.Item>
+                    <Flex.Item style={{flex: 1}}>{showValue(item.order.price, 9, 4)}  {oAbi.unitName(item.order.unit)}</Flex.Item>
                     <Flex.Item style={{flex: 1}}>{showValue(item.order.value, 18, 4)}</Flex.Item>
                     <Flex.Item style={{flex: 1}}>
                         {
@@ -124,7 +152,7 @@ export class MyOrders extends BasePage {
         return (
             <div className="ui segment">
                 {
-                    this.state.order != null ? <UserOrders order={this.state.order} back={this.back.bind(this)}/> :
+                    this.state.order != null ? <UserOrders order={this.state.order} back={this.back.bind(this)} code={this.state.code}/> :
                         <div className="ui list">
                             <div className="item">
                                 <Flex style={{fontSize: '12px', fontWeight: 'bold'}}>

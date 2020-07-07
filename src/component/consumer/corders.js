@@ -1,27 +1,40 @@
 import React, {Component} from 'react';
-import {Modal, Flex, List, WhiteSpace, WingBlank, Icon, Card} from "antd-mobile";
+import {Modal, Flex, WhiteSpace, Icon, Card} from "antd-mobile";
 import 'semantic-ui-css/semantic.min.css';
 import oAbi from '../oabi'
 import {bytes32ToToken, formatDate, showValue} from "../common";
-import BasePage from "../basepage";
 import BigNumber from 'bignumber.js'
 import language from '../language'
+import Iframe from "react-iframe";
 
 const alert = Modal.alert;
 
-export class MyOrders extends BasePage {
+export class COrders extends Component {
     constructor(props) {
-        super(props, {
-            orders: []
-        });
+        super(props);
+        this.state = {pk: this.props.pk, orders: []}
     }
 
-    _componentDidMount(mainPKr) {
+    componentDidMount() {
         let self = this;
-        self.init(mainPKr);
-        self.timer = setInterval(function () {
-            self.init();
-        }, 10 * 1000);
+        oAbi.init
+            .then(() => {
+                oAbi.accountDetails(this.state.pk, function (account) {
+                    oAbi.myKyc(account.pk, account.mainPKr, function (code, pcode, hasAudited) {
+                        self.setState({mainPKr: account.mainPKr, code: code, pcode: pcode, hasAudited: hasAudited});
+                        self.init(account.mainPKr);
+                        self.timer = setInterval(function () {
+                            self.init();
+                        }, 10 * 1000);
+                    });
+                });
+            });
+    }
+
+    componentWillUnmount() {
+        if (this.timer) {
+            clearInterval(this.timer);
+        }
     }
 
     init(mainPKr) {
@@ -29,13 +42,26 @@ export class MyOrders extends BasePage {
         if (!mainPKr) {
             mainPKr = this.state.mainPKr;
         }
-        console.log("init myorder")
         oAbi.userOrders(mainPKr, true, function (orders) {
-            orders.sort(function (a, b) {
-                return b.order.updateTime - a.order.updateTime;
-            });
-            self.setState({orders: orders});
+            if(orders) {
+                orders.sort(function (a, b) {
+                    return b.order.updateTime - a.order.updateTime;
+                });
+                self.setState({orders: orders});
+            }
         });
+    }
+
+    componentWillReceiveProps(nextProps) {
+        let self = this;
+        if (nextProps.pk != this.props.pk) {
+            oAbi.accountDetails(nextProps.pk, function (account) {
+                oAbi.myKyc(account.pk, account.mainPKr, function (code) {
+                    self.setState({pk: nextProps.pk, mainPKr: account.mainPKr, code: code});
+                    self.init(account.mainPKr);
+                })
+            });
+        }
     }
 
     render() {
@@ -93,7 +119,8 @@ export class MyOrders extends BasePage {
                     <Card.Header
                         title={
                             <span>{item.order.orderType == 0 ? language.e().order.buy : language.e().order.sell} {bytes32ToToken(item.order.token)}</span>}
-                        extra={<div><span style={{float:'left'}}>ID: {item.id}</span>&nbsp;&nbsp;&nbsp;<span style={{textAlign: 'right'}}>{status}</span></div>}
+                        extra={<div><span style={{float: 'left'}}>ID: {item.id}</span>&nbsp;&nbsp;&nbsp;<span
+                            style={{textAlign: 'right'}}>{status}</span></div>}
                     />
                     <Card.Body>
                         <Flex>
@@ -112,31 +139,41 @@ export class MyOrders extends BasePage {
                         </Flex>
                     </Card.Body>
                     <Card.Footer extra={<div>
-                        {item.order.status == 2 &&
-                        <span>
-                                <a onClick={() => {
-                                    alert('KYC', <span>{item.hcode}, {item.ecode}</span>, [
-                                        {text: language.e().modal.cancel, onPress: () => console.log('cancel')},
-                                        {text: language.e().modal.ok, onPress: () => console.log('ok')},
-                                    ])
-                                }
-                                }>KYC</a> |
-                            </span>
+                         <span>
+                        {item.order.status == 2 ?
+
+                            <a onClick={() => {
+                                oAbi.pkrDecrypt(self.state.pk, item.mcode, function (code1) {
+                                    let url = "https://ahoj.xyz/level/code1/" + code1 + "?lang=cn";
+                                    Modal.alert('支付信息', <div>
+                                        <Iframe url={url}
+                                                width="100%"
+                                                height="450px"
+                                                display="initial"
+                                                position="relative"/>
+                                    </div>);
+                                });
+                            }
+                            }>支付信息</a> : <a onClick={() => {
+                                let url = "https://ahoj.xyz/level/code2/" + item.hcode + "?lang=cn";
+                                Modal.alert('联系商家', <div>
+                                    <Iframe url={url}
+                                            width="100%"
+                                            height="450px"
+                                            display="initial"
+                                            position="relative"/>
+                                </div>);
+                            }}>{language.e().order.tips8}</a>
                         }
-                        <a onClick={() => {
-                            alert(language.e().order.tips8, <span>{item.hcode}</span>, [
-                                {text: language.e().modal.cancel, onPress: () => console.log('cancel')},
-                                {text: language.e().modal.ok, onPress: () => console.log('ok')},
-                            ])
-                        }}>{language.e().order.tips8}</a>
+                         </span>
                     </div>}/>
                 </Card>
             </div>
         });
         return (
-            <div className="ui list">{showOrders&&showOrders.length>0?showOrders:
-                <div style={{textAlign:'center'}}>
-                    <Icon type="iconnodata-topic" style={{width:"100px",height:"100px"}}/>
+            <div className="ui list">{showOrders && showOrders.length > 0 ? showOrders :
+                <div style={{textAlign: 'center'}}>
+                    <Icon type="iconnodata-topic" style={{width: "100px", height: "100px"}}/>
                 </div>}</div>
         )
     }

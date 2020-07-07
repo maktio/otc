@@ -1,25 +1,44 @@
 import React, {Component} from 'react';
-import {Flex, Modal, WhiteSpace, WingBlank,SegmentedControl,NavBar,Icon} from "antd-mobile";
+import {Flex, Modal, WhiteSpace, WingBlank, SegmentedControl, NavBar, Icon, Tabs} from "antd-mobile";
 import 'semantic-ui-css/semantic.min.css';
 import oAbi from './oabi'
 import {showPK} from "./common";
-import {BusinessPage} from "./business/business";
-import {CustomerPag} from "./consumer/customer";
 import {AuditingList} from "./auditing";
-import language from './language'
+import {COrders} from "./consumer/corders";
+import {MarketOrders} from "./consumer/marketorders";
+import {Placeorder} from "./business/placeorder";
+import {BOrders} from "./business/borders";
 
 const operation = Modal.operation;
+
+const tabs0 = [
+    {title: "买入", showType: 0},
+    {title: "卖出", showType: 1},
+    {title: "订单", showType: 2},
+]
+
+const tabs1 = [
+    {title: "商家买入", showType: 0},
+    {title: "商家卖出", showType: 1},
+    {title: "商家订单", showType: 2},
+]
+
 
 export class Otc extends Component {
 
     constructor(props) {
         super(props);
+        let selectedIndex = 0;
+        if (document.URL.indexOf("page=business") != -1) {
+            selectedIndex = 1;
+        }
         this.state = {
-            name:localStorage.getItem("NAME"),
+            name: localStorage.getItem("NAME"),
             pk: localStorage.getItem("PK"),
             mainPKr: localStorage.getItem("MAINPKR"),
-            showType: true,
-            isOwner:false
+            selectedIndex: selectedIndex,
+            showType: 0,
+            isOwner: false
         }
     }
 
@@ -46,7 +65,7 @@ export class Otc extends Component {
                     let mainPKr = localStorage.getItem("MAINPKR");
                     let name = localStorage.getItem("NAME");
                     oAbi.auditor(mainPKr, function (owner) {
-                        self.setState({pk: pk, mainPKr: mainPKr,name:name, isOwner: mainPKr == owner});
+                        self.setState({pk: pk, mainPKr: mainPKr, name: name, isOwner: mainPKr == owner});
                     });
                 }
             })
@@ -83,9 +102,25 @@ export class Otc extends Component {
             })
     }
 
+    renderContent(showType) {
+        if (this.state.selectedIndex == 0) {
+            if (showType == 2) {
+                return <COrders pk={this.state.pk}/>;
+            } else {
+                return <MarketOrders pk={this.state.pk} orderType={showType}/>
+            }
+        } else {
+            if (showType == 2) {
+                return <BOrders pk={this.state.pk}/>;
+            } else {
+                return <Placeorder pk={this.state.pk} orderType={showType}/>
+            }
+        }
+    }
+
     render() {
         return (
-            <div>
+            <WingBlank>
                 <NavBar
                     mode="light"
                     rightContent={[
@@ -96,22 +131,50 @@ export class Otc extends Component {
                     <SegmentedControl
                         values={['个人', '商家']}
                         tintColor={'#000'}
-                        style={{ width: '150px' }}
-                        onValueChange={()=>{this.setState({showType: !this.state.showType})}}
+                        style={{width: '150px'}}
+                        selectedIndex={this.state.selectedIndex}
+                        onValueChange={() => {
+                            this.setState({showType: 0, selectedIndex: (this.state.selectedIndex + 1) % 2})
+                        }}
                     />
                 </NavBar>
 
-                <WhiteSpace/>
-                <WingBlank>
-                    <div>
-                        {this.state.showType ? <CustomerPag pk={this.state.pk}/> : <BusinessPage pk={this.state.pk}/>}
-                    </div>
-                    <WhiteSpace/>
+                <div>
                     {
-                        this.state.isOwner && <AuditingList/>
+                        this.state.selectedIndex == 0 ?
+                            <Tabs tabs={tabs0}
+                                  swipeable={false}
+                                  initialPage={0}
+                                  onChange={(tab, index) => {
+                                      this.setState({showType: tab.showType})
+                                  }}
+                                  onTabClick={(tab, index) => {
+                                      this.setState({showType: tab.showType})
+                                  }}
+                            >
+                            </Tabs> :
+                            <Tabs tabs={tabs1}
+                                  swipeable={false}
+                                  initialPage={0}
+                                  onChange={(tab, index) => {
+                                      this.setState({showType: tab.showType})
+                                  }}
+                                  onTabClick={(tab, index) => {
+                                      this.setState({showType: tab.showType})
+                                  }}
+                            >
+                            </Tabs>
                     }
-                </WingBlank>
-            </div>
+                    {
+                        this.renderContent(this.state.showType)
+                    }
+
+                </div>
+                <WhiteSpace/>
+                {
+                    this.state.isOwner && <AuditingList/>
+                }
+            </WingBlank>
         )
 
     }

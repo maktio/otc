@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
-import {Button, Flex, List, Modal, SegmentedControl, Toast, WhiteSpace, Card, Icon, Accordion} from "antd-mobile";
+import {Button, Modal, Toast, WhiteSpace, Card, Icon} from "antd-mobile";
 import 'semantic-ui-css/semantic.min.css';
 import oAbi from '../oabi'
 import BigNumber from "bignumber.js";
 import {randomByte32, showValue} from "../common";
 import BasePage from "../basepage";
 import language from '../language'
+import Iframe from "react-iframe";
 
 const alert = Modal.alert;
 
@@ -46,7 +47,6 @@ export class MarketOrders extends BasePage {
             return;
         }
 
-        console.log("businessOrders", unit);
         oAbi.businessOrders(mainPKr, token, unit, false, function (orders) {
             let ids = [];
             let sellOrders = [];
@@ -81,8 +81,6 @@ export class MarketOrders extends BasePage {
     }
 
     render() {
-        let self = this;
-        const {token} = this.state;
         let orderType = this.props.orderType;
         let tabList = oAbi.tokenList().map((item, index) => {
             return <div className="item" key={index}>
@@ -96,12 +94,12 @@ export class MarketOrders extends BasePage {
 
 
         let orders;
-        if (orderType == 0) {
+        if (orderType == 1) {
             orders = this.state.buyOrders;
         } else {
             orders = this.state.sellOrders;
         }
-
+        let self = this;
         let showOrders = orders.map((item, index) => {
             let value = item.order.value - item.order.dealtValue - item.order.lockinValue;
             return (
@@ -110,14 +108,17 @@ export class MarketOrders extends BasePage {
                         <Card.Header
                             title={item.name}
                             extra={<span onClick={() => {
-                                alert('联系方式', <span>{item.hcode}</span>, [
-                                    {text: language.e().modal.cancel, onPress: () => console.log('cancel')},
-                                    {text: language.e().modal.ok, onPress: () => console.log('ok')},
-                                ])
-                            }}>联系</span>}
+                                let url = "https://ahoj.xyz/level/code2/" + item.hcode + "?lang=cn";
+                                alert('联系方式', <Iframe url={url}
+                                                      width="100%"
+                                                      height="450px"
+                                                      display="initial"
+                                                      position="relative"/>
+                                )
+                            }}>联系商家</span>}
                         />
                         <Card.Body>
-                            <div style={{fontSize: "14px", fontWeight: "800"}}>{showValue(item.order.price, 9, 4)} CNY
+                            <div style={{fontSize: "14px", fontWeight: "800"}}>{showValue(item.order.price, 9, 4)} {oAbi.unitName(self.state.unit)}
                             </div>
                         </Card.Body>
                         <Card.Footer content={
@@ -128,8 +129,8 @@ export class MarketOrders extends BasePage {
                         } extra={
                             <Button type="ghost" inline size="small" style={{marginRight: '4px'}}
                                     onClick={() => {
-                                        if (!this.state.ecode) {
-                                            this.kyc();
+                                        if (this.state.auditedStatus == 0) {
+                                            this.kyc(false);
                                         } else {
                                             let options = values.map((value, index) => {
                                                 if (new BigNumber(value).multipliedBy(new BigNumber(10).pow(18)).comparedTo(new BigNumber(item.order.value - item.order.dealtValue)) <= 0) {
@@ -139,7 +140,7 @@ export class MarketOrders extends BasePage {
                                                 }
                                             });
                                             Modal.alert(
-                                                <span>{orderType == 0 ? language.e().order.sell : language.e().order.buy}</span>,
+                                                <span>{orderType == 1 ? language.e().order.sell : language.e().order.buy}</span>,
                                                 <div>
                                                     <select className="ui selection dropdown"
                                                             ref={el => this.amountValue = el}
@@ -162,20 +163,21 @@ export class MarketOrders extends BasePage {
                                                                 Toast.fail("超出可交易范围!");
                                                                 return;
                                                             }
-                                                            //ecode
-                                                            let code = randomByte32();
-                                                            if (orderType == 1) {
-                                                                oAbi.exchangeBuy(this.state.pk, this.state.mainPKr, code, item.id, amount);
-                                                            } else {
-                                                                oAbi.exchangeSell(this.state.pk, this.state.mainPKr, code, item.id, this.state.token, amount);
-                                                            }
+
+                                                            oAbi.pkrEncrypt(item.pkr, oAbi.code1(self.state.code), function (mcode) {
+                                                                if (orderType == 0) {
+                                                                    oAbi.exchangeBuy(self.state.pk, self.state.mainPKr, mcode, item.id, amount);
+                                                                } else {
+                                                                    oAbi.exchangeSell(self.state.pk, self.state.mainPKr, mcode, item.id, self.state.token, amount);
+                                                                }
+                                                            });
                                                         }
                                                     },
                                                 ])
                                         }
 
                                     }}>
-                                {orderType == 0 ? language.e().order.sell : language.e().order.buy}
+                                {orderType == 1 ? language.e().order.sell : language.e().order.buy}
                             </Button>
                         }/>
                     </Card>
@@ -216,7 +218,7 @@ export class MarketOrders extends BasePage {
                             </div>
                         </div>
                     </div>
-                    <div className="divider">&nbsp;&nbsp;&nbsp;&nbsp;|</div>
+                    <div className="divider">&nbsp;&nbsp;&nbsp;&nbsp;</div>
                     <div className="section">
                         <div className="ui small horizontal divided list">
                             {tabList}

@@ -31,6 +31,10 @@ export function formatDate(time) {
 
 }
 
+export function hash(data) {
+    return "0x" + Buffer.from(keccak256(data)).toString('hex')
+}
+
 export function showToken(token) {
     if (token.length > 15) {
         return token.slice(0, 10) + "..." + token.slice(-5)
