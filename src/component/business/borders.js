@@ -16,7 +16,7 @@ export class BOrders extends Component {
         this.state = {
             pk: this.props.pk,
             orders: [],
-            order: null
+            orderId: null
         }
     }
 
@@ -40,9 +40,11 @@ export class BOrders extends Component {
                     oAbi.myKyc(account.pk, account.mainPKr, function (code) {
                         self.setState({pk: account.pk, mainPKr: account.mainPKr, code: code});
                         self.init(account.mainPKr);
-                        self.timer = setInterval(function () {
-                            self.init();
-                        }, 10 * 1000);
+                        if(!self.timer) {
+                            self.timer = setInterval(function () {
+                                self.init();
+                            }, 20 * 1000);
+                        }
                     });
                 });
             });
@@ -59,35 +61,12 @@ export class BOrders extends Component {
         if (!mainPKr) {
             mainPKr = this.state.mainPKr;
         }
-        oAbi.businessOrders(mainPKr, "", 0, true, function (orders) {
-            orders.sort(function (a, b) {
-                return b.order.timestemp - a.order.timestemp;
-            });
-            if (orders.length > 0) {
-                let orderMap = new Map();
-                orders.forEach(item => {
-                    item.childs = [];
-                    orderMap.set(item.id, item);
+        oAbi.businessOrderList(mainPKr, "", 0, true, function (orders) {
+            if (orders) {
+                orders.sort(function (a, b) {
+                    return b.order.timestemp - a.order.timestemp;
                 });
-                oAbi.userOrders(mainPKr, false, function (childs) {
-                    if (childs.length > 0) {
-                        let pkrs = [];
-                        childs.forEach(item => {
-                            item.pkr = "0x" + item.order.owner.slice(-40);
-                            pkrs.push(item.pkr);
-                            orderMap.get(item.order.businessOrderId).childs.push(item);
-                        });
-
-                        oAbi.getFullAddress(pkrs, function (rets) {
-                            childs.forEach(item => {
-                                item.pkr = rets.result[item.pkr];
-                            });
-                            self.setState({orders: orders});
-                        });
-                    } else {
-                        self.setState({orders: orders});
-                    }
-                });
+                self.setState({orders: orders});
             } else {
                 self.setState({orders: []});
             }
@@ -95,23 +74,15 @@ export class BOrders extends Component {
     }
 
     back() {
-        this.setState({order: null});
+        this.setState({orderId: null});
     }
 
     render() {
         let self = this;
         let orders = this.state.orders.map((item, index) => {
-            let num = 0;
+            // let num = 0;
             let canCancel = true;
             let underway = item.order.status == 0 && new BigNumber(item.order.value).comparedTo(new BigNumber(item.order.dealtValue)) > 0;
-            if (underway && item.childs && item.childs.length > 0) {
-                item.childs.map((child, cindex) => {
-                    if (child.order.status == 1 || child.order.status == 2) {
-                        canCancel = false;
-                        num++;
-                    }
-                });
-            }
             let status = "进行中";
             if (!underway) {
                 canCancel = false;
@@ -141,9 +112,9 @@ export class BOrders extends Component {
                             }>撤消</a> : status
                         }
                     </Flex.Item>
-                    <Flex.Item style={{flex: 1}}>{num}</Flex.Item>
+                    <Flex.Item style={{flex: 1}}>{item.underwayCount}</Flex.Item>
                     <Flex.Item style={{flex: 1, textAlign: 'right'}}><a onClick={() => {
-                        self.setState({order: item});
+                        self.setState({orderId: item.id});
                     }}><Icon type="right"/></a></Flex.Item>
                 </Flex>
             </div>
@@ -152,7 +123,7 @@ export class BOrders extends Component {
         return (
             <div className="ui segment">
                 {
-                    this.state.order != null ? <UserOrders order={this.state.order} back={this.back.bind(this)} code={this.state.code}/> :
+                    this.state.orderId != null ? <UserOrders orderId={this.state.orderId} back={this.back.bind(this)} code={this.state.code}/> :
                         <div className="ui list">
                             <div className="item">
                                 <Flex style={{fontSize: '12px', fontWeight: 'bold'}}>

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Modal, Toast, WhiteSpace, Card, Icon} from "antd-mobile";
+import {Button, Modal, Toast, WhiteSpace, Card, Icon, Flex, List, Radio} from "antd-mobile";
 import 'semantic-ui-css/semantic.min.css';
 import oAbi from '../oabi'
 import BigNumber from "bignumber.js";
@@ -17,9 +17,15 @@ export class MarketOrders extends BasePage {
         super(props, {
             sellOrders: [],
             buyOrders: [],
-            token: oAbi.tokenList()[0],
+            token: oAbi.tokenList(0)[0],
             unit: 0,
-            showSelect: false
+            showSelect: false,
+            showPopup: false,
+            payType: 0,
+            popup: "",
+            pkr: "",
+            id: "",
+            maxValue:0
         });
     }
 
@@ -27,9 +33,11 @@ export class MarketOrders extends BasePage {
         let self = this;
         self.init(mainPKr, this.state.token);
 
-        self.timer = setInterval(function () {
-            self.init();
-        }, 20 * 1000);
+        if (!self.timer) {
+            self.timer = setInterval(function () {
+                self.init();
+            }, 20 * 1000);
+        }
     }
 
     init(mainPKr, token, unit) {
@@ -47,7 +55,9 @@ export class MarketOrders extends BasePage {
             return;
         }
 
-        oAbi.businessOrders(mainPKr, token, unit, false, function (orders) {
+        console.log("businessOrderList", mainPKr, token, unit);
+        oAbi.businessOrderList(mainPKr, token, unit, false, function (orders) {
+
             let ids = [];
             let sellOrders = [];
             let buyOrders = [];
@@ -80,9 +90,20 @@ export class MarketOrders extends BasePage {
         });
     }
 
-    render() {
+    createOrder(pkr, orderId, amount, payType) {
+        let self = this;
         let orderType = this.props.orderType;
-        let tabList = oAbi.tokenList().map((item, index) => {
+        oAbi.pkrEncrypt(pkr, oAbi.code1(self.state.code), function (mcode) {
+            if (orderType == 0) {
+                oAbi.exchangeBuy(self.state.pk, self.state.mainPKr, mcode, orderId, amount, payType);
+            } else {
+                oAbi.exchangeSell(self.state.pk, self.state.mainPKr, mcode, orderId, self.state.token, amount, payType);
+            }
+        });
+    }
+
+    render() {
+        let tabList = oAbi.tokenList(this.state.unit).map((item, index) => {
             return <div className="item" key={index}>
                 <a style={this.state.token == item ? {fontWeight: 'bold', color: 'black'} : {}} onClick={() => {
                     this.setState({token: item});
@@ -92,7 +113,7 @@ export class MarketOrders extends BasePage {
             </div>
         });
 
-
+        let orderType = this.props.orderType;
         let orders;
         if (orderType == 1) {
             orders = this.state.buyOrders;
@@ -108,18 +129,43 @@ export class MarketOrders extends BasePage {
                         <Card.Header
                             title={item.name}
                             extra={<span onClick={() => {
-                                let url = "https://ahoj.xyz/level/code2/" + item.hcode + "?lang=cn";
-                                alert('联系方式', <Iframe url={url}
+                                let url = "https://ahoj.xyz/levelInfo/code2/" + item.hcode + "?lang=cn";
+                                alert(language.e().order.tips8, <Iframe url={url}
                                                       width="100%"
                                                       height="450px"
                                                       display="initial"
                                                       position="relative"/>
                                 )
-                            }}>联系商家</span>}
+                            }}>{language.e().order.tips8}</span>}
                         />
                         <Card.Body>
-                            <div style={{fontSize: "14px", fontWeight: "800"}}>{showValue(item.order.price, 9, 4)} {oAbi.unitName(self.state.unit)}
-                            </div>
+                            <Flex>
+                                <Flex.Item>
+                                    <div style={{
+                                        fontSize: "14px",
+                                        fontWeight: "800"
+                                    }}>{showValue(item.order.price, 9, 4)} {oAbi.unitName(self.state.unit)}
+                                    </div>
+                                </Flex.Item>
+
+                                <Flex.Item style={{textAlign: 'right'}}>
+                                    <a onClick={() => {
+                                        let payMethods = []
+                                        oAbi.getPayTypes(item.hcode, function (list) {
+                                            list.forEach((item) => {
+                                                payMethods.push(<Flex>
+                                                    <Flex.Item>{item.type}</Flex.Item>
+                                                    <Flex.Item>{item.account}</Flex.Item>
+                                                    <Flex.Item>{item.channel}</Flex.Item>
+                                                </Flex>)
+                                            });
+                                            Modal.alert("", payMethods);
+                                        })
+                                    }}>
+                                        支付方式
+                                    </a>
+                                </Flex.Item>
+                            </Flex>
                         </Card.Body>
                         <Card.Footer content={
                             <div>
@@ -132,48 +178,21 @@ export class MarketOrders extends BasePage {
                                         if (this.state.auditedStatus == 0) {
                                             this.kyc(false);
                                         } else {
-                                            let options = values.map((value, index) => {
-                                                if (new BigNumber(value).multipliedBy(new BigNumber(10).pow(18)).comparedTo(new BigNumber(item.order.value - item.order.dealtValue)) <= 0) {
-                                                    return (
-                                                        <option key={index} value={value}>{value}</option>
-                                                    )
-                                                }
+                                            oAbi.getPayTypes(item.hcode, function (list) {
+                                                let payTypes = list.map((each, index) => {
+                                                    return <Radio.RadioItem key={index}
+                                                                            checked={self.state.payType === index}
+                                                                            onChange={() => {
+                                                                                self.setState({payType: index});
+                                                                            }}>
+                                                        {each.type + " " + each.channel + " " + each.account}
+                                                    </Radio.RadioItem>
+                                                });
+                                                self.setState({
+                                                    payTypes: payTypes, showPopup: true, id: item.id, pkr: item.pkr,
+                                                    maxValue: item.order.value - item.order.dealtValue
+                                                });
                                             });
-                                            Modal.alert(
-                                                <span>{orderType == 1 ? language.e().order.sell : language.e().order.buy}</span>,
-                                                <div>
-                                                    <select className="ui selection dropdown"
-                                                            ref={el => this.amountValue = el}
-                                                            onChange={(e) => {
-                                                                this.amountValue.value = e.target.value;
-                                                            }}>
-                                                        {options}
-                                                    </select>
-                                                </div>
-                                                , [
-                                                    {text: 'Cancel'},
-                                                    {
-                                                        text: 'Ok', onPress: () => {
-                                                            let amount = new BigNumber(this.amountValue.value).multipliedBy(new BigNumber(10).pow(18)).toNumber();
-                                                            if (amount == 0) {
-                                                                Toast.fail("输入金额为0");
-                                                                return;
-                                                            }
-                                                            if (amount > (item.order.value - item.order.dealtValue)) {
-                                                                Toast.fail("超出可交易范围!");
-                                                                return;
-                                                            }
-
-                                                            oAbi.pkrEncrypt(item.pkr, oAbi.code1(self.state.code), function (mcode) {
-                                                                if (orderType == 0) {
-                                                                    oAbi.exchangeBuy(self.state.pk, self.state.mainPKr, mcode, item.id, amount);
-                                                                } else {
-                                                                    oAbi.exchangeSell(self.state.pk, self.state.mainPKr, mcode, item.id, self.state.token, amount);
-                                                                }
-                                                            });
-                                                        }
-                                                    },
-                                                ])
                                         }
 
                                     }}>
@@ -187,6 +206,54 @@ export class MarketOrders extends BasePage {
 
         return (
             <div>
+                <div>
+                    <Modal
+                        popup
+                        visible={this.state.showPopup}
+                        animationType="slide-up"
+                    >
+                        <List renderHeader={() => <div>委托买入</div>} className="popup-list">
+
+                            <List.Item>
+                                <div>
+                                    <select className="ui selection dropdown"
+                                            ref={el => this.amountValue = el}
+                                            onChange={(e) => {
+                                                this.amountValue.value = e.target.value;
+                                            }}>
+                                        <option key={0} value={100}>100</option>
+                                        <option key={0} value={200}>200</option>
+                                        <option key={0} value={500}>500</option>
+                                        <option key={0} value={1000}>1000</option>
+                                        <option key={0} value={5000}>5000</option>
+                                        <option key={0} value={10000}>10000</option>
+                                        <option key={0} value={30000}>30000</option>
+                                    </select>
+                                </div>
+                            </List.Item>
+                            {this.state.payTypes}
+                            <List.Item>
+                                <Button type="primary" onClick={() => {
+                                    let amount = new BigNumber(this.amountValue.value).multipliedBy(new BigNumber(10).pow(18)).toNumber();
+                                    if (amount == 0) {
+                                        Toast.fail("输入金额为0");
+                                        return;
+                                    }
+                                    if (amount > this.state.maxValue) {
+                                        Toast.fail("超出可交易范围!");
+                                        return;
+                                    }
+                                    self.createOrder(this.state.pkr, this.state.id, this.amountValue.value, this.state.payType);
+                                    self.setState({showPopup: false});
+                                }}>
+                                    {orderType == 1 ? language.e().order.sell : language.e().order.buy}
+                                </Button>
+                            </List.Item>
+                        </List>
+                    </Modal>
+                </div>
+
+
                 <WhiteSpace/>
                 <div className="ui breadcrumb">
                     <div className="section">

@@ -6,7 +6,7 @@ import {showValue} from "../common";
 import BigNumber from "bignumber.js";
 import BasePage from "../basepage";
 
-export class Placeorder extends BasePage {
+export class PlaceOrder extends BasePage {
     constructor(props) {
         super(props, {
             sellOrders: [],
@@ -19,9 +19,11 @@ export class Placeorder extends BasePage {
     _componentDidMount(mainPKr) {
         let self = this;
         self.init(mainPKr, this.state.token);
-        self.timer = setInterval(function () {
-            self.init();
-        }, 10 * 1000);
+        if(!self.timer) {
+            self.timer = setInterval(function () {
+                self.init();
+            }, 20 * 1000);
+        }
     }
 
     _componentWillReceiveProps(nextProps) {
@@ -49,7 +51,7 @@ export class Placeorder extends BasePage {
         oAbi.init
             .then(() => {
                 console.log("businessOrders", unit);
-                oAbi.businessOrders(mainPKr, token, unit, false, function (orders) {
+                oAbi.businessOrderList(mainPKr, token, unit, false, function (orders) {
                     let sellOrders = [];
                     let buyOrders = [];
 
@@ -90,7 +92,7 @@ export class Placeorder extends BasePage {
                 </Flex>
             </List.Item>
         });
-        let tabList = oAbi.tokenList().map((item, index) => {
+        let tabList = oAbi.tokenList(this.state.unit).map((item, index) => {
             return <div className="item" key={index}>
                 <a style={this.state.token == item ? {fontWeight: 'bold', color: 'black'} : {}} onClick={() => {
                     this.setState({token: item});

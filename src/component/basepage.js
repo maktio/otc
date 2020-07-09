@@ -7,7 +7,7 @@ import * as cookie from "react-cookies";
 
 const host = "http://localhost:3000";
 
-export default class Basepage extends Component {
+export default class BasePage extends Component {
 
     constructor(props, state) {
         super(props);
@@ -19,21 +19,12 @@ export default class Basepage extends Component {
         });
     }
 
-    fetchKyc() {
-        let self = this;
-        self.kycTimer = setInterval(function () {
-            oAbi.myKyc(self.state.pk, self.state.mainPKr, function (code, auditedStatus) {
-                if (code) {
-                    self.setState({code: code, auditedStatus: auditedStatus});
-                    clearInterval(self.kycTimer);
-                }
-            });
-        }, 10 * 1000);
-    }
-
     commitKyc(auditing, code) {
         let self = this;
-        Modal.alert(language.e().kyc.title2,
+        if (this.modal) {
+            return;
+        }
+        this.modal = Modal.alert(language.e().kyc.title2,
             <div>
                 <div className="ui input"><input type="text" placeholder="name"
                                                  onChange={(event) => {
@@ -51,11 +42,12 @@ export default class Basepage extends Component {
             [
                 {
                     text: <span>{language.e().modal.cancel}</span>, onPress: () => {
-                        // window.location.href = host;
+                        window.location.href = host;
                     }
                 },
                 {
                     text: <span>{language.e().modal.ok}</span>, onPress: () => {
+                        self.modal = null;
                         let name = self.nameValue.value;
                         let code1 = oAbi.code1(code);
                         let code2 = oAbi.code2(code1);
@@ -65,23 +57,13 @@ export default class Basepage extends Component {
                                     oAbi.pkrEncrypt(auditor, code1, function (pcode) {
                                         console.log("registerKyc", auditor, code, code2, ecode, pcode);
                                         oAbi.registerKyc(self.state.pk, self.state.mainPKr, name, code2, ecode, pcode, function (res, error) {
-                                            if(error) {
-                                                // window.location.href = host;
-                                            } else {
-                                                cookie.save('hasRegister', true, {path: '/', maxAge: 30});
-                                                self.fetchKyc();
-                                            }
+                                            window.location.href = host;
                                         });
                                     });
                                 });
                             } else {
                                 oAbi.registerKyc(self.state.pk, self.state.mainPKr, name, code2, ecode, "0x", function (res, error) {
-                                    if(error) {
-                                        // window.location.href = host;
-                                    } else {
-                                        cookie.save('hasRegister', true, {path: '/', maxAge: 20});
-                                        self.fetchKyc();
-                                    }
+                                    window.location.href = host;
                                 });
                             }
                         });
@@ -114,7 +96,7 @@ export default class Basepage extends Component {
                                 } else {
                                     urlenc = encodeURIComponent("http://localhost:3000/?page=customer&code=codeId");
                                 }
-                                window.location.href = "https://ahoj.xyz/profile?lang=cn&ref=" + urlenc;
+                                window.location.href = "https://ahoj.xyz/profile?lang=cn&force=" + this.state.code + "&ref=" + urlenc;
                             }
                         },
                     ])
@@ -144,15 +126,15 @@ export default class Basepage extends Component {
 
     componentWillUnmount() {
         if (this.timer) {
+            console.log("componentWillUnmount", this.timer);
             clearInterval(this.timer);
         }
         if (this.kycTimer) {
-            clearInterval(this.kycTimer);
+            clearInterval(this.timer);
         }
     }
 
     componentDidMount() {
-        console.log("componentDidMount", this.props.orderType, this);
         let url = document.URL;
         let code0;
         let index = url.indexOf("code=");
@@ -169,6 +151,16 @@ export default class Basepage extends Component {
                         if (self._componentDidMount) {
                             self._componentDidMount(account.mainPKr, code);
                         }
+
+                        if (!code) {
+                            self.kycTimer = setInterval(function () {
+                                oAbi.myKyc(account.pk, account.mainPKr, function (code, auditedStatus) {
+                                    self.setState({code: code, auditedStatus: auditedStatus});
+                                })
+                            }, 20 * 1000);
+                        }
+
+                        console.log("componentDidMount", self)
                         if (!code && code0 && !cookie.load('clear')) {
                             if (url.indexOf("page=business") != -1) {
                                 self.commitKyc(true, code0);

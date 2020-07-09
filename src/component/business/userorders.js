@@ -15,16 +15,39 @@ export class UserOrders extends Component {
         this.state = {
             pk: localStorage.getItem("PK"),
             mainPKr: localStorage.getItem("MAINPKR"),
+            orders: []
         };
+    }
+
+    componentDidMount() {
+        let self = this;
+        oAbi.userOrderListByBId(this.state.mainPKr, this.props.orderId, function (orders) {
+            orders.sort(function (a, b) {
+                return b.order.updateTime - a.order.updateTime;
+            });
+
+            if (orders.length > 0) {
+                let pkrs = [];
+                orders.forEach(item => {
+                    item.pkr = "0x" + item.order.owner.slice(-40);
+                    pkrs.push(item.pkr);
+                });
+
+                oAbi.getFullAddress(pkrs, function (rets) {
+                    orders.forEach(item => {
+                        item.pkr = rets.result[item.pkr];
+                    });
+                });
+            }
+            self.setState({orders: orders});
+        })
     }
 
     render() {
         let self = this;
         let code = this.props.code;
-        let childs = this.props.order.childs.sort(function (a, b) {
-            return b.order.updateTime - a.order.updateTime;
-        });
-        let ordersHtml = childs.map((child, index) => {
+
+        let ordersHtml = this.state.orders.map((child, index) => {
             let html;
             if (child.order.status == 1) {
                 html = <div style={{textAlign: 'right'}}>
@@ -127,6 +150,8 @@ export class UserOrders extends Component {
                     text = language.e().order.tips4;
                 } else if (child.order.status == 5) {
                     text = language.e().order.tips5;
+                } if (child.order.status == 6) {
+                    text = "仲裁中"
                 }
                 html = <span>{text}</span>
             }
@@ -147,10 +172,10 @@ export class UserOrders extends Component {
                     </Card.Body>
                     <Card.Footer content={formatDate(new Date(child.order.updateTime * 1000))} extra={<span>
                         <a onClick={() => {
-                            console.log("child.mcode",child.mcode);
+                            console.log("child.mcode", child.mcode);
                             oAbi.pkrDecrypt(self.state.pk, child.mcode, function (code1) {
                                 if (oAbi.code2(code1) === child.hcode) {
-                                    let url = "https://ahoj.xyz/level/code1/" + code1 + "?lang=cn";
+                                    let url = "https://ahoj.xyz/levelInfo/code1/" + code1 + "?lang=cn";
                                     Modal.alert('', <Iframe url={url}
                                                             width="100%"
                                                             height="450px"

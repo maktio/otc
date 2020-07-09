@@ -7,7 +7,7 @@ import {showPK} from "./component/common";
 import {AuditingList} from "./component/auditing";
 import {COrders} from "./component/consumer/corders";
 import {MarketOrders} from "./component/consumer/marketorders";
-import {Placeorder} from "./component/business/placeorder";
+import {PlaceOrder} from "./component/business/placeorder";
 import {BOrders} from "./component/business/borders";
 
 const operation = Modal.operation;
@@ -38,11 +38,13 @@ class App extends Component {
             mainPKr: localStorage.getItem("MAINPKR"),
             selectedIndex: selectedIndex,
             showType: 0,
-            isOwner: false
+            isOwner: false,
+            origin:true
         }
     }
 
     componentDidMount() {
+        console.log("componentDidMount");
         let self = this;
 
         oAbi.init
@@ -113,7 +115,7 @@ class App extends Component {
             if (showType == 2) {
                 return <BOrders pk={this.state.pk}/>;
             } else {
-                return <Placeorder pk={this.state.pk} orderType={showType}/>
+                return <PlaceOrder pk={this.state.pk} orderType={showType}/>
             }
         }
     }
@@ -134,7 +136,8 @@ class App extends Component {
                         style={{width: '150px'}}
                         selectedIndex={this.state.selectedIndex}
                         onValueChange={() => {
-                            this.setState({showType: 0, selectedIndex: (this.state.selectedIndex + 1) % 2})
+                            console.log("SegmentedControl", this.state.showType, this.state.selectedIndex);
+                            this.setState({origin:false, selectedIndex: (this.state.selectedIndex + 1) % 2})
                         }}
                     />
                 </NavBar>
@@ -148,18 +151,12 @@ class App extends Component {
                                   onChange={(tab, index) => {
                                       this.setState({showType: tab.showType})
                                   }}
-                                  onTabClick={(tab, index) => {
-                                      this.setState({showType: tab.showType})
-                                  }}
                             >
                             </Tabs> :
                             <Tabs tabs={tabs1}
                                   swipeable={false}
                                   initialPage={0}
                                   onChange={(tab, index) => {
-                                      this.setState({showType: tab.showType})
-                                  }}
-                                  onTabClick={(tab, index) => {
                                       this.setState({showType: tab.showType})
                                   }}
                             >

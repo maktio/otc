@@ -60,5 +60,6 @@
 }
 
 .am-modal-transparent {
-  width: unset !important;
+  width: auto;
+  min-width:270px;
 }

@@ -42,7 +42,7 @@ export class COrders extends Component {
         if (!mainPKr) {
             mainPKr = this.state.mainPKr;
         }
-        oAbi.userOrders(mainPKr, true, function (orders) {
+        oAbi.userOrderList(mainPKr, function (orders) {
             if(orders) {
                 orders.sort(function (a, b) {
                     return b.order.updateTime - a.order.updateTime;
@@ -95,6 +95,8 @@ export class COrders extends Component {
                 text = language.e().order.tips4;
             } else if (item.order.status == 5) {
                 text = language.e().order.tips5;
+            } else if (item.order.status == 6) {
+                text = "仲裁中"
             }
             let status = <span>{text}
                 {
@@ -144,7 +146,7 @@ export class COrders extends Component {
 
                             <a onClick={() => {
                                 oAbi.pkrDecrypt(self.state.pk, item.mcode, function (code1) {
-                                    let url = "https://ahoj.xyz/level/code1/" + code1 + "?lang=cn";
+                                    let url = "https://ahoj.xyz/levelInfo/code1/" + code1 + "?lang=cn";
                                     Modal.alert('支付信息', <div>
                                         <Iframe url={url}
                                                 width="100%"
@@ -155,8 +157,8 @@ export class COrders extends Component {
                                 });
                             }
                             }>支付信息</a> : <a onClick={() => {
-                                let url = "https://ahoj.xyz/level/code2/" + item.hcode + "?lang=cn";
-                                Modal.alert('联系商家', <div>
+                                let url = "https://ahoj.xyz/levelInfo/code2/" + item.hcode + "?lang=cn";
+                                Modal.alert(language.e().order.tips8, <div>
                                     <Iframe url={url}
                                             width="100%"
                                             height="450px"

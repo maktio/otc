@@ -12,15 +12,15 @@ import {BOrders} from "./business/borders";
 const operation = Modal.operation;
 
 const tabs0 = [
-    {title: "买入", showType: 0},
-    {title: "卖出", showType: 1},
-    {title: "订单", showType: 2},
+    {title: "买入", index: 0},
+    {title: "卖出", index: 1},
+    {title: "订单", index: 2},
 ]
 
 const tabs1 = [
-    {title: "商家买入", showType: 0},
-    {title: "商家卖出", showType: 1},
-    {title: "商家订单", showType: 2},
+    {title: "商家买入", index: 0},
+    {title: "商家卖出", index: 1},
+    {title: "商家订单", index: 2},
 ]
 
 
@@ -37,6 +37,7 @@ export class Otc extends Component {
             pk: localStorage.getItem("PK"),
             mainPKr: localStorage.getItem("MAINPKR"),
             selectedIndex: selectedIndex,
+            initialPage:0,
             showType: 0,
             isOwner: false
         }
@@ -134,7 +135,7 @@ export class Otc extends Component {
                         style={{width: '150px'}}
                         selectedIndex={this.state.selectedIndex}
                         onValueChange={() => {
-                            this.setState({showType: 0, selectedIndex: (this.state.selectedIndex + 1) % 2})
+                            this.setState({initialPage:0, selectedIndex: (this.state.selectedIndex + 1) % 2})
                         }}
                     />
                 </NavBar>
@@ -144,29 +145,29 @@ export class Otc extends Component {
                         this.state.selectedIndex == 0 ?
                             <Tabs tabs={tabs0}
                                   swipeable={false}
-                                  initialPage={0}
+                                  initialPage={this.state.initialPage}
                                   onChange={(tab, index) => {
-                                      this.setState({showType: tab.showType})
+                                      this.setState({initialPage: tab.index})
                                   }}
                                   onTabClick={(tab, index) => {
-                                      this.setState({showType: tab.showType})
+                                      this.setState({initialPage: tab.index})
                                   }}
                             >
                             </Tabs> :
                             <Tabs tabs={tabs1}
                                   swipeable={false}
-                                  initialPage={0}
+                                  initialPage={this.state.initialPage}
                                   onChange={(tab, index) => {
-                                      this.setState({showType: tab.showType})
+                                      this.setState({initialPage: tab.index})
                                   }}
                                   onTabClick={(tab, index) => {
-                                      this.setState({showType: tab.showType})
+                                      this.setState({initialPage: tab.index})
                                   }}
                             >
                             </Tabs>
                     }
                     {
-                        this.renderContent(this.state.showType)
+                        this.renderContent(this.state.initialPage)
                     }
 
                 </div>

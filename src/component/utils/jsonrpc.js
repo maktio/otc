@@ -23,6 +23,17 @@ class JsonRpc {
         })
     }
 
+    post(url, data, callback) {
+        axios.post(url, data).then(function (response) {
+            let data = response.data
+            if (callback) {
+                callback(data);
+            }
+        }).catch(function (error) {
+            console.log("req error: ", error);
+        })
+    }
+
     get(url, cb) {
         axios.get(url).then(function (rest) {
             if (cb) {
