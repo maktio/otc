@@ -136,7 +136,6 @@ class App extends Component {
                         style={{width: '150px'}}
                         selectedIndex={this.state.selectedIndex}
                         onValueChange={() => {
-                            console.log("SegmentedControl", this.state.showType, this.state.selectedIndex);
                             this.setState({origin:false, selectedIndex: (this.state.selectedIndex + 1) % 2})
                         }}
                     />

@@ -197,9 +197,14 @@ contract OTC is SeroInterface, Role {
             Types.UserOrder memory userOrder = orders[i];
             Kyc memory kyc = kycs[kycsMap[userOrder.owner]];
 
-            rets[i] = Types.RetUserOrder({id : ids[i], order : userOrder, name : kyc.name,
-                arbitration : kyc.userRoleArbitrates, hcode : kycsMap[userOrder.owner],
-                mcode : ordersKyc[ids[i]][0], unit : businessOrder.unit});
+            if (userOrder.value != 0) {
+                rets[i] = Types.RetUserOrder({id : ids[i], order : userOrder, name : kyc.name,
+                    arbitration : kyc.userRoleArbitrates, hcode : kycsMap[userOrder.owner],
+                    mcode : ordersKyc[ids[i]][0], unit : businessOrder.unit});
+            } else {
+                rets[i] = Types.RetUserOrder({id : 0, order : userOrder, name : "",
+                    arbitration : 0, hcode : bytes32(0), mcode : new bytes(0), unit : 0});
+            }
         }
     }
 

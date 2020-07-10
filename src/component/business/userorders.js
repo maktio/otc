@@ -15,11 +15,12 @@ export class UserOrders extends Component {
         this.state = {
             pk: localStorage.getItem("PK"),
             mainPKr: localStorage.getItem("MAINPKR"),
-            orders: []
+            orders: [],
+            loading:false
         };
     }
 
-    componentDidMount() {
+    reload(callback) {
         let self = this;
         oAbi.userOrderListByBId(this.state.mainPKr, this.props.orderId, function (orders) {
             orders.sort(function (a, b) {
@@ -40,12 +41,18 @@ export class UserOrders extends Component {
                 });
             }
             self.setState({orders: orders});
+            if (callback) {
+                callback();
+            }
         })
+    }
+    componentDidMount() {
+        this.reload();
     }
 
     render() {
         let self = this;
-        let code = this.props.code;
+        const {code, orderType} = this.props;
         let ordersHtml = this.state.orders.map((child, index) => {
             let html;
             if (child.order.status == 1) {
@@ -193,9 +200,27 @@ export class UserOrders extends Component {
         return (
             <div>
                 <div>
-                    <Button onClick={() => {
-                        back();
-                    }}>返回</Button><WhiteSpace/>
+                    <Flex>
+                        <Flex.Item style={{textAlign:'left',paddingLeft:'5px'}}><a onClick={() => {
+                            back();
+                        }}><img src={require('../icon/back.png')} style={{width:"25px",height:"20px"}}/></a></Flex.Item>
+                        <Flex.Item style={{textAlign: 'center', fontWeight: 'bold'}}>
+                            {orderType == 0 ? "买入" : "卖出"}
+                        </Flex.Item>
+                        <Flex.Item style={{textAlign:'right',paddingRight:'5px'}}>
+                            <a onClick={() => {
+                                self.setState({loading:true})
+                                self.reload(function () {
+                                    self.setState({loading:false})
+                                });
+                            }}>{
+                                this.state.loading ?<Icon type={'loading'} />:
+                                <img src={require('../icon/refurbish.png')} style={{width:"20px",height:"20px"}}/>
+                            }
+                            </a>
+                        </Flex.Item>
+                    </Flex>
+                    <WhiteSpace/>
                 </div>
                 {ordersHtml}
             </div>

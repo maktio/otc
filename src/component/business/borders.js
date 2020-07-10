@@ -81,63 +81,72 @@ export class BOrders extends Component {
         let self = this;
         let orders = this.state.orders.map((item, index) => {
             // let num = 0;
-            let canCancel = true;
+            let canCancel = item.underwayCount == 0;
             let underway = item.order.status == 0 && new BigNumber(item.order.value).comparedTo(new BigNumber(item.order.dealtValue)) > 0;
             let status = "进行中";
             if (!underway) {
-                canCancel = false;
                 status = item.order.status == 4 ? "已取消" : "已完成";
             }
 
-            return <div className="item" key={index}>
-                <Flex style={{fontSize: '12px'}}>
-                    <Flex.Item
-                        style={{flex: 2}}>{item.id}</Flex.Item>
-                    <Flex.Item
-                        style={{flex: 4}}>{item.order.orderType == 0 ? language.e().order.buy : language.e().order.sell}{bytes32ToToken(item.order.token)}</Flex.Item>
-                    <Flex.Item style={{flex: 3}}>{showValue(item.order.price, 9, 4)}{oAbi.unitName(item.order.unit)}</Flex.Item>
-                    <Flex.Item style={{flex: 3}}>{showValue(item.order.value, 18, 4)}</Flex.Item>
-                    <Flex.Item style={{flex: 3}}>
-                        {
-                            canCancel ? <a onClick={() => {
-                                alert(language.e().order.cancel, <span>ID:{item.id}</span>, [
-                                    {text: language.e().modal.cancel, onPress: () => console.log('cancel')},
-                                    {
-                                        text: language.e().modal.ok, onPress: () => {
-                                            oAbi.businessCancel(this.state.pk, this.state.mainPKr, item.id);
-                                        }
-                                    },
-                                ])
+            return (
+                <div className="item">
+                    <Card>
+                        <Card.Header
+                            title={
+                                <span>{item.order.orderType == 0 ? language.e().order.buy : language.e().order.sell}{bytes32ToToken(item.order.token)}
+                        </span>}
+                            extra={
+                                <div className="ui breadcrumb">
+                                    <div className="section">ID:{item.id}</div>
+                                    <div className="divider"></div>
+                                    <div className="section">{canCancel ? <a onClick={() => {
+                                        alert(language.e().order.cancel, <span>ID:{item.id}</span>, [
+                                            {text: language.e().modal.cancel, onPress: () => console.log('cancel')},
+                                            {
+                                                text: language.e().modal.ok, onPress: () => {
+                                                    oAbi.businessCancel(this.state.pk, this.state.mainPKr, item.id);
+                                                }
+                                            },
+                                        ])
+                                    }
+                                    }>撤消</a> : status}</div>
+                                </div>
                             }
-                            }>撤消</a> : status
-                        }
-                    </Flex.Item>
-                    <Flex.Item style={{flex: 1}}>{item.underwayCount}</Flex.Item>
-                    <Flex.Item style={{flex: 1, textAlign: 'right'}}><a onClick={() => {
-                        self.setState({orderId: item.id, unitName: oAbi.unitName(item.order.unit)});
-                    }}><Icon type="right"/></a></Flex.Item>
-                </Flex>
-            </div>
+                        />
+                        <Card.Body>
+                            <div>
+                                <Flex>
+                                    <Flex.Item>数量({bytes32ToToken(item.order.token)})</Flex.Item>
+                                    <Flex.Item>价格({oAbi.unitName(item.order.unit)})</Flex.Item>
+                                    <Flex.Item>已成交</Flex.Item>
+                                </Flex>
+                                <Flex>
+                                    <Flex.Item>{showValue(item.order.value, 18, 4)}</Flex.Item>
+                                    <Flex.Item>{showValue(item.order.price, 9, 4)}</Flex.Item>
+                                    <Flex.Item>{showValue(item.order.dealtValue, 18, 4)}</Flex.Item>
+                                </Flex>
+
+                            </div>
+                        </Card.Body>
+                        <Card.Footer content="footer content" extra={<span>
+                            处理中订单数量
+                            <a onClick={() => {
+                                self.setState({orderId: item.id, orderType: item.order.orderType});
+                            }}> {item.underwayCount}</a>
+                        </span>}/>
+                    </Card>
+                    <WhiteSpace/>
+                </div>
+
+            )
         });
 
         return (
             <div className="ui segment">
                 {
-                    this.state.orderId != null ? <UserOrders orderId={this.state.orderId} back={this.back.bind(this)} code={this.state.code} unitName={this.state.unitName}/> :
+                    this.state.orderId != null ?
+                        <UserOrders orderId={this.state.orderId} back={this.back.bind(this)} code={this.state.code} orderType={this.state.orderType}/> :
                         <div className="ui list">
-                            <div className="item">
-                                <Flex style={{fontSize: '12px', fontWeight: 'bold'}}>
-                                    <Flex.Item
-                                        style={{flex: 2}}>ID</Flex.Item>
-                                    <Flex.Item
-                                        style={{flex: 4}}>{language.e().order.orderType}</Flex.Item>
-                                    <Flex.Item style={{flex: 3}}>{language.e().order.price}</Flex.Item>
-                                    <Flex.Item style={{flex: 3}}>{language.e().order.amount}</Flex.Item>
-                                    <Flex.Item style={{flex: 3}}>状态</Flex.Item>
-                                    <Flex.Item style={{flex: 1}}>交易</Flex.Item>
-                                    <Flex.Item style={{flex: 1}}></Flex.Item>
-                                </Flex>
-                            </div>
                             {
                                 orders && orders.length > 0 ? orders :
                                     <div className="item" style={{textAlign: 'center'}}>
