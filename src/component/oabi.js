@@ -48,7 +48,7 @@ class OAbi {
         if(unitMap.has(Number(unit))) {
             return unitMap.get(Number(unit));
         }
-        return  "SSS";
+        return  "ALL";
 
     }
 
@@ -123,6 +123,9 @@ class OAbi {
     }
 
     accountDetails(pk, callback) {
+        if (!pk) {
+            return;
+        }
         let self = this;
         seropp.getAccountDetail(pk, function (item) {
             callback({pk: item.PK, mainPKr: item.MainPKr, name: item.Name, balances: item.Balance})
