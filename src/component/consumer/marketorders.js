@@ -104,11 +104,11 @@ export class MarketOrders extends BasePage {
     render() {
         let tabList = oAbi.tokenList(this.state.unit).map((item, index) => {
             return <div className="item" key={index}>
-                <a style={this.state.token == item ? {fontWeight: 'bold', color: 'black'} : {}} onClick={() => {
+                <span style={this.state.token == item ? {fontWeight: 'bold', color: 'black'} : {}} onClick={() => {
                     this.setState({token: item});
                     this.init(this.state.mainPKr, item);
                 }}>{item
-                }</a>
+                }</span>
             </div>
         });
 
