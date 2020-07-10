@@ -1,11 +1,11 @@
-pragma solidity ^0.6.9;
+pragma solidity ^0.6.6;
 
 // SPDX-License-Identifier: GPL-3.0 pragma solidity >=0.4.16 <0.7.0;
 import "../common/math.sol";
 
 library Types {
 
-    enum OrderStatus {underway, waitConfirmed, confirmed, refused, canceled, finished}
+    enum OrderStatus {underway, waitConfirmed, confirmed, refused, canceled, finished, arbitrate}
     enum OrderType {buy, sell}
 
 
@@ -32,6 +32,7 @@ library Types {
         bytes32 token;
         uint256 createTime;
         uint256 updateTime;
+        uint8 payType;
         OrderStatus status;
         OrderType orderType;
     }
@@ -41,6 +42,7 @@ library Types {
         Types.BusinessOrder order;
         string name;
         bytes32 hcode;
+        uint256 underwayCount;
         uint256 deals;
         uint256 arbitration;
         uint8[] labels;
@@ -50,7 +52,7 @@ library Types {
         uint256 id;
         Types.UserOrder order;
         bytes32 hcode;
-        bytes32 ecode;
+        bytes mcode;
         uint256 arbitration;
         string name;
     }

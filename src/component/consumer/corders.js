@@ -73,12 +73,12 @@ export class COrders extends Component {
             } else if (item.order.status == 2) {
                 let value = new BigNumber(item.order.price).multipliedBy(item.order.value).dividedBy(new BigNumber(10).pow(27)).toNumber();
                 if (item.order.orderType == 0) {
-                    text = language.e().order.tips2_0 + value + "CNY";
+                    text = language.e().order.tips2_0 + value + oAbi.unitName(item.unit);
                 } else {
                     text = <span>
-                        {language.e().order.tips2_1}{value}CNY,
+                        {language.e().order.tips2_1}{value} {oAbi.unitName(item.unit)},
                         <a onClick={() => {
-                            alert(language.e().order.pass, <span>请确认已经收到对方付款，应收:{value}CNY</span>, [
+                            alert(language.e().order.pass, <span>请确认已经收到对方付款，应收:{value} {oAbi.unitName(item.unit)}</span>, [
                                 {text: language.e().modal.cancel, onPress: () => console.log('cancel')},
                                 {
                                     text: language.e().modal.ok, onPress: () => {
@@ -128,11 +128,11 @@ export class COrders extends Component {
                         <Flex>
                             <Flex.Item style={{flex: 2}}>
                                 <div>{language.e().order.time}</div>
-                                <div>{formatDate(new Date(item.order.updateTime * 1000))}</div>
+                                <div>{formatDate(new Date(item.order.createTime * 1000))}</div>
                             </Flex.Item>
                             <Flex.Item style={{flex: 1}}>
                                 <div>{language.e().order.price}</div>
-                                <div>{showValue(item.order.price, 9, 4)}</div>
+                                <div>{showValue(item.order.price, 9, 4)} {oAbi.unitName(item.unit)}</div>
                             </Flex.Item>
                             <Flex.Item style={{flex: 1, textAlign: 'right'}}>
                                 <div>{language.e().order.amount}</div>

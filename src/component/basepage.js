@@ -55,7 +55,6 @@ export default class BasePage extends Component {
                             if (auditing) {
                                 oAbi.auditor(self.state.mainPKr, function (auditor) {
                                     oAbi.pkrEncrypt(auditor, code1, function (pcode) {
-                                        console.log("registerKyc", auditor, code, code2, ecode, pcode);
                                         oAbi.registerKyc(self.state.pk, self.state.mainPKr, name, code2, ecode, pcode, function (res, error) {
                                             window.location.href = host;
                                         });
@@ -126,7 +125,6 @@ export default class BasePage extends Component {
 
     componentWillUnmount() {
         if (this.timer) {
-            console.log("componentWillUnmount", this.timer);
             clearInterval(this.timer);
         }
         if (this.kycTimer) {
@@ -156,11 +154,13 @@ export default class BasePage extends Component {
                             self.kycTimer = setInterval(function () {
                                 oAbi.myKyc(account.pk, account.mainPKr, function (code, auditedStatus) {
                                     self.setState({code: code, auditedStatus: auditedStatus});
+                                    if (code) {
+                                        clearInterval(self.kycTimer);
+                                    }
                                 })
                             }, 20 * 1000);
                         }
 
-                        console.log("componentDidMount", self)
                         if (!code && code0 && !cookie.load('clear')) {
                             if (url.indexOf("page=business") != -1) {
                                 self.commitKyc(true, code0);

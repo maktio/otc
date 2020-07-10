@@ -69,7 +69,7 @@ export class AuditingList extends Component {
                         <Flex.Item style={{flex: 1, textAlign: 'right'}}><a onClick={() => {
                             oAbi.pkrDecrypt(self.state.pk, item.pcode, function (code1) {
                                 if (oAbi.code2(code1) === item.hcode) {
-                                    let url = "https://ahoj.xyz/level/code1/" + code1 + "?lang=cn";
+                                    let url = "https://ahoj.xyz/levelInfo/code1/" + code1 + "?lang=cn";
                                     Modal.alert('', <Iframe url={url}
                                                             width="100%"
                                                             height="450px"

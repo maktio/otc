@@ -46,7 +46,6 @@ export class UserOrders extends Component {
     render() {
         let self = this;
         let code = this.props.code;
-
         let ordersHtml = this.state.orders.map((child, index) => {
             let html;
             if (child.order.status == 1) {
@@ -86,7 +85,7 @@ export class UserOrders extends Component {
                                 },
                             ]);
                     }}>
-                        {language.e().order.op}
+                        {language.e().order.confirm}/{language.e().order.refuse}
                     </a>
                 </div>
             } else if (child.order.status == 2) {
@@ -94,7 +93,7 @@ export class UserOrders extends Component {
                 if (child.order.orderType == 1) {
                     if (parseInt(new Date().getTime() / 1000) - child.order.updateTime < 24 * 60 * 60) {
                         html =
-                            <span>{language.e().order.tips2_0},{value} CNY</span>
+                            <span>{language.e().order.tips2_0},{value} {oAbi.unitName(child.unit)}</span>
                     } else {
                         html = <span>超时放行,<a onClick={() => {
                             alert("结束订单", <span>ID:{child.id}</span>, [
@@ -111,7 +110,7 @@ export class UserOrders extends Component {
                     if (parseInt(new Date().getTime() / 1000) - child.order.updateTime > 24 * 60 * 60) {
                         html =
                             <span>{language.e().order.tips2_4},<a onClick={() => {
-                                alert("请确认未收到付款!", <span>应收:{value} CNY</span>, [
+                                alert("请确认未收到付款!", <span>应收:{value} {oAbi.unitName(child.unit)}</span>, [
                                     {
                                         text: language.e().modal.cancel, onPress: () => {
                                         }
@@ -125,9 +124,9 @@ export class UserOrders extends Component {
                             }}
                             >取消</a></span>
                     } else {
-                        html = <span>{language.e().order.tips2_1}{value}CNY,<a onClick={() => {
+                        html = <span>{language.e().order.tips2_1}{value} {oAbi.unitName(child.unit)},<a onClick={() => {
 
-                            alert(language.e().order.tips2_3, <span>应收:{value} CNY</span>, [
+                            alert(language.e().order.tips2_3, <span>应收:{value} {oAbi.unitName(child.unit)}</span>, [
                                 {
                                     text: language.e().modal.cancel, onPress: () => {
                                     }
@@ -165,14 +164,13 @@ export class UserOrders extends Component {
                     <Card.Body>
                         <div>
                             <Flex style={{fontSize: '14px'}}>
-                                <Flex.Item style={{flex: 1}}>{showValue(child.order.price, 9, 4)}</Flex.Item>
-                                <Flex.Item style={{flex: 1}}>{showValue(child.order.value, 18, 4)}</Flex.Item>
+                                <Flex.Item style={{flex: 1}}>{showValue(child.order.price, 9, 4)}{oAbi.unitName(child.unit)}</Flex.Item>
+                                <Flex.Item style={{flex: 1}}>{showValue(child.order.value, 18, 4)} {bytes32ToToken(child.order.token)}</Flex.Item>
                             </Flex>
                         </div>
                     </Card.Body>
                     <Card.Footer content={formatDate(new Date(child.order.updateTime * 1000))} extra={<span>
                         <a onClick={() => {
-                            console.log("child.mcode", child.mcode);
                             oAbi.pkrDecrypt(self.state.pk, child.mcode, function (code1) {
                                 if (oAbi.code2(code1) === child.hcode) {
                                     let url = "https://ahoj.xyz/levelInfo/code1/" + code1 + "?lang=cn";

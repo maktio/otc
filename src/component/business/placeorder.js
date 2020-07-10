@@ -11,7 +11,7 @@ export class PlaceOrder extends BasePage {
         super(props, {
             sellOrders: [],
             buyOrders: [],
-            token: oAbi.tokenList()[0],
+            token: oAbi.tokenList(0)[0],
             unit: 0
         });
     }
@@ -50,7 +50,6 @@ export class PlaceOrder extends BasePage {
         let self = this;
         oAbi.init
             .then(() => {
-                console.log("businessOrders", unit);
                 oAbi.businessOrderList(mainPKr, token, unit, false, function (orders) {
                     let sellOrders = [];
                     let buyOrders = [];

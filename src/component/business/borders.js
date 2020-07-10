@@ -92,12 +92,12 @@ export class BOrders extends Component {
             return <div className="item" key={index}>
                 <Flex style={{fontSize: '12px'}}>
                     <Flex.Item
-                        style={{flex: 1}}>{item.id}</Flex.Item>
+                        style={{flex: 2}}>{item.id}</Flex.Item>
                     <Flex.Item
-                        style={{flex: 2}}>{item.order.orderType == 0 ? language.e().order.buy : language.e().order.sell}{bytes32ToToken(item.order.token)}</Flex.Item>
-                    <Flex.Item style={{flex: 1}}>{showValue(item.order.price, 9, 4)}  {oAbi.unitName(item.order.unit)}</Flex.Item>
-                    <Flex.Item style={{flex: 1}}>{showValue(item.order.value, 18, 4)}</Flex.Item>
-                    <Flex.Item style={{flex: 1}}>
+                        style={{flex: 4}}>{item.order.orderType == 0 ? language.e().order.buy : language.e().order.sell}{bytes32ToToken(item.order.token)}</Flex.Item>
+                    <Flex.Item style={{flex: 3}}>{showValue(item.order.price, 9, 4)}{oAbi.unitName(item.order.unit)}</Flex.Item>
+                    <Flex.Item style={{flex: 3}}>{showValue(item.order.value, 18, 4)}</Flex.Item>
+                    <Flex.Item style={{flex: 3}}>
                         {
                             canCancel ? <a onClick={() => {
                                 alert(language.e().order.cancel, <span>ID:{item.id}</span>, [
@@ -114,7 +114,7 @@ export class BOrders extends Component {
                     </Flex.Item>
                     <Flex.Item style={{flex: 1}}>{item.underwayCount}</Flex.Item>
                     <Flex.Item style={{flex: 1, textAlign: 'right'}}><a onClick={() => {
-                        self.setState({orderId: item.id});
+                        self.setState({orderId: item.id, unitName: oAbi.unitName(item.order.unit)});
                     }}><Icon type="right"/></a></Flex.Item>
                 </Flex>
             </div>
@@ -123,17 +123,17 @@ export class BOrders extends Component {
         return (
             <div className="ui segment">
                 {
-                    this.state.orderId != null ? <UserOrders orderId={this.state.orderId} back={this.back.bind(this)} code={this.state.code}/> :
+                    this.state.orderId != null ? <UserOrders orderId={this.state.orderId} back={this.back.bind(this)} code={this.state.code} unitName={this.state.unitName}/> :
                         <div className="ui list">
                             <div className="item">
                                 <Flex style={{fontSize: '12px', fontWeight: 'bold'}}>
                                     <Flex.Item
-                                        style={{flex: 1}}>ID</Flex.Item>
+                                        style={{flex: 2}}>ID</Flex.Item>
                                     <Flex.Item
-                                        style={{flex: 2}}>{language.e().order.orderType}</Flex.Item>
-                                    <Flex.Item style={{flex: 1}}>{language.e().order.price}</Flex.Item>
-                                    <Flex.Item style={{flex: 1}}>{language.e().order.amount}</Flex.Item>
-                                    <Flex.Item style={{flex: 1}}>状态</Flex.Item>
+                                        style={{flex: 4}}>{language.e().order.orderType}</Flex.Item>
+                                    <Flex.Item style={{flex: 3}}>{language.e().order.price}</Flex.Item>
+                                    <Flex.Item style={{flex: 3}}>{language.e().order.amount}</Flex.Item>
+                                    <Flex.Item style={{flex: 3}}>状态</Flex.Item>
                                     <Flex.Item style={{flex: 1}}>交易</Flex.Item>
                                     <Flex.Item style={{flex: 1}}></Flex.Item>
                                 </Flex>

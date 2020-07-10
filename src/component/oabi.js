@@ -4,447 +4,23 @@ import {tokenToBytes} from "./common";
 import {JsonRpc} from "./utils/jsonrpc";
 import BigNumber from 'bignumber.js'
 
-import {Toast} from "antd-mobile";
+import {Radio, Toast} from "antd-mobile";
+import React from "react";
 
 const B2B = require("blake2b")
 
 const config = {
     name: "OTC",
-    contractAddress: "kcxcoNF22ZssXCGPdN58Ar1P8FsB6cF5vmRzTVNyWCD9viRWvo9jKDfT7ckdEMxnFXSrjZxWbzyLpzNxy4iSUoV",
+    contractAddress: "25S2YrgyHGKHytGwxgvqXLp5LwyP1eqNhBQ6g8mrxsQCJAw1ftMjxCVuDUPNDdSgpaZU4Fxo5E7EdbvXZv6SZzAv",
     github: "https://github.com/coral-dex/otc",
     author: "otc",
     url: document.location.href,
     logo: document.location.protocol + '//' + document.location.host + '/otc/logo.png'
 };
 
-const abiJson = [{
-    "inputs": [{"internalType": "address", "name": "_auditor", "type": "address"}],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-}, {
-    "anonymous": false,
-    "inputs": [{
-        "indexed": true,
-        "internalType": "address",
-        "name": "previousOwner",
-        "type": "address"
-    }, {"indexed": true, "internalType": "address", "name": "newOwner", "type": "address"}],
-    "name": "OwnershipTransferred",
-    "type": "event"
-}, {
-    "inputs": [{"internalType": "bytes32", "name": "hcode", "type": "bytes32"}, {
-        "internalType": "uint8",
-        "name": "label",
-        "type": "uint8"
-    }], "name": "addLable", "outputs": [], "stateMutability": "nonpayable", "type": "function"
-}, {
-    "inputs": [{"internalType": "address", "name": "_manager", "type": "address"}],
-    "name": "addManager",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-}, {
-    "inputs": [{"internalType": "string", "name": "token", "type": "string"}],
-    "name": "addToken",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-}, {
-    "inputs": [{"internalType": "uint256", "name": "userOrderId", "type": "uint256"}],
-    "name": "arbitrate",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-}, {
-    "inputs": [], "name": "arbitrateOrders", "outputs": [{
-        "components": [{
-            "internalType": "uint256",
-            "name": "id",
-            "type": "uint256"
-        }, {
-            "components": [{"internalType": "address", "name": "owner", "type": "address"}, {
-                "internalType": "uint256",
-                "name": "businessOrderId",
-                "type": "uint256"
-            }, {"internalType": "uint256", "name": "value", "type": "uint256"}, {
-                "internalType": "uint256",
-                "name": "price",
-                "type": "uint256"
-            }, {"internalType": "bytes32", "name": "token", "type": "bytes32"}, {
-                "internalType": "uint256",
-                "name": "createTime",
-                "type": "uint256"
-            }, {"internalType": "uint256", "name": "updateTime", "type": "uint256"}, {
-                "internalType": "uint8",
-                "name": "payType",
-                "type": "uint8"
-            }, {
-                "internalType": "enum Types.OrderStatus",
-                "name": "status",
-                "type": "uint8"
-            }, {"internalType": "enum Types.OrderType", "name": "orderType", "type": "uint8"}],
-            "internalType": "struct Types.UserOrder",
-            "name": "order",
-            "type": "tuple"
-        }, {"internalType": "bytes32", "name": "hcode", "type": "bytes32"}, {
-            "internalType": "bytes",
-            "name": "mcode",
-            "type": "bytes"
-        }, {"internalType": "uint256", "name": "arbitration", "type": "uint256"}, {
-            "internalType": "string",
-            "name": "name",
-            "type": "string"
-        }], "internalType": "struct Types.RetUserOrder[]", "name": "rets", "type": "tuple[]"
-    }], "stateMutability": "view", "type": "function"
-}, {
-    "inputs": [{"internalType": "bytes32[]", "name": "hcodes", "type": "bytes32[]"}, {
-        "internalType": "bool",
-        "name": "status",
-        "type": "bool"
-    }], "name": "audited", "outputs": [], "stateMutability": "nonpayable", "type": "function"
-}, {
-    "inputs": [],
-    "name": "auditingList",
-    "outputs": [{
-        "components": [{
-            "internalType": "bytes32",
-            "name": "hcode",
-            "type": "bytes32"
-        }, {"internalType": "bytes", "name": "pcode", "type": "bytes"}],
-        "internalType": "struct OTC.RetAuditedInfo[]",
-        "name": "rets",
-        "type": "tuple[]"
-    }],
-    "stateMutability": "view",
-    "type": "function"
-}, {
-    "inputs": [],
-    "name": "auditor",
-    "outputs": [{"internalType": "address", "name": "", "type": "address"}],
-    "stateMutability": "view",
-    "type": "function"
-}, {
-    "inputs": [{"internalType": "string", "name": "tokenName", "type": "string"}, {
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
-    }, {"internalType": "uint256", "name": "minDealValue", "type": "uint256"}, {
-        "internalType": "uint256",
-        "name": "maxDealVlaue",
-        "type": "uint256"
-    }, {"internalType": "uint256", "name": "price", "type": "uint256"}, {
-        "internalType": "uint8",
-        "name": "unit",
-        "type": "uint8"
-    }], "name": "businessBuy", "outputs": [], "stateMutability": "nonpayable", "type": "function"
-}, {
-    "inputs": [{"internalType": "uint256", "name": "orderId", "type": "uint256"}],
-    "name": "businessCancel",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-}, {
-    "inputs": [{"internalType": "string", "name": "tokenName", "type": "string"}, {
-        "internalType": "uint8",
-        "name": "unit",
-        "type": "uint8"
-    }, {"internalType": "bool", "name": "myself", "type": "bool"}], "name": "businessOrderList", "outputs": [{
-        "components": [{
-            "internalType": "uint256",
-            "name": "id",
-            "type": "uint256"
-        }, {
-            "components": [{"internalType": "address", "name": "owner", "type": "address"}, {
-                "internalType": "bytes32",
-                "name": "token",
-                "type": "bytes32"
-            }, {"internalType": "uint256", "name": "value", "type": "uint256"}, {
-                "internalType": "uint256",
-                "name": "dealtValue",
-                "type": "uint256"
-            }, {"internalType": "uint256", "name": "lockinValue", "type": "uint256"}, {
-                "internalType": "uint256",
-                "name": "minDealValue",
-                "type": "uint256"
-            }, {"internalType": "uint256", "name": "maxDealValue", "type": "uint256"}, {
-                "internalType": "uint256",
-                "name": "price",
-                "type": "uint256"
-            }, {"internalType": "uint256", "name": "timestemp", "type": "uint256"}, {
-                "internalType": "uint8",
-                "name": "unit",
-                "type": "uint8"
-            }, {
-                "internalType": "enum Types.OrderType",
-                "name": "orderType",
-                "type": "uint8"
-            }, {"internalType": "enum Types.OrderStatus", "name": "status", "type": "uint8"}],
-            "internalType": "struct Types.BusinessOrder",
-            "name": "order",
-            "type": "tuple"
-        }, {"internalType": "string", "name": "name", "type": "string"}, {
-            "internalType": "bytes32",
-            "name": "hcode",
-            "type": "bytes32"
-        }, {"internalType": "uint256", "name": "underwayCount", "type": "uint256"}, {
-            "internalType": "uint256",
-            "name": "deals",
-            "type": "uint256"
-        }, {"internalType": "uint256", "name": "arbitration", "type": "uint256"}, {
-            "internalType": "uint8[]",
-            "name": "labels",
-            "type": "uint8[]"
-        }], "internalType": "struct Types.RetBusinessOrder[]", "name": "rets", "type": "tuple[]"
-    }], "stateMutability": "view", "type": "function"
-}, {
-    "inputs": [{"internalType": "uint256", "name": "minDealValue", "type": "uint256"}, {
-        "internalType": "uint256",
-        "name": "maxDealVlaue",
-        "type": "uint256"
-    }, {"internalType": "uint256", "name": "price", "type": "uint256"}, {
-        "internalType": "uint8",
-        "name": "unit",
-        "type": "uint8"
-    }], "name": "businessSell", "outputs": [], "stateMutability": "payable", "type": "function"
-}, {
-    "inputs": [{"internalType": "uint256", "name": "userOrderId", "type": "uint256"}, {
-        "internalType": "bytes",
-        "name": "mcode",
-        "type": "bytes"
-    }], "name": "confirmed", "outputs": [], "stateMutability": "nonpayable", "type": "function"
-}, {
-    "inputs": [{"internalType": "bytes", "name": "mcode", "type": "bytes"}, {
-        "internalType": "uint256",
-        "name": "orderId",
-        "type": "uint256"
-    }, {"internalType": "uint256", "name": "value", "type": "uint256"}, {
-        "internalType": "uint8",
-        "name": "payType",
-        "type": "uint8"
-    }], "name": "exchangeBuy", "outputs": [], "stateMutability": "nonpayable", "type": "function"
-}, {
-    "inputs": [{"internalType": "bytes", "name": "mcode", "type": "bytes"}, {
-        "internalType": "uint256",
-        "name": "orderId",
-        "type": "uint256"
-    }, {"internalType": "uint8", "name": "payType", "type": "uint8"}],
-    "name": "exchangeSell",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-}, {
-    "inputs": [{"internalType": "uint256", "name": "userOrderId", "type": "uint256"}, {
-        "internalType": "uint8",
-        "name": "winRole",
-        "type": "uint8"
-    }], "name": "executeArbitrate", "outputs": [], "stateMutability": "nonpayable", "type": "function"
-}, {
-    "inputs": [{"internalType": "uint256", "name": "userOrderId", "type": "uint256"}],
-    "name": "finished",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-}, {
-    "inputs": [{"internalType": "bytes32", "name": "hcode", "type": "bytes32"}],
-    "name": "invalidAudited",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-}, {
-    "inputs": [],
-    "name": "myKyc",
-    "outputs": [{"internalType": "bytes32", "name": "", "type": "bytes32"}, {
-        "internalType": "uint8",
-        "name": "",
-        "type": "uint8"
-    }, {
-        "components": [{"internalType": "string", "name": "name", "type": "string"}, {
-            "internalType": "uint64",
-            "name": "deals",
-            "type": "uint64"
-        }, {"internalType": "uint64", "name": "userRoleArbitrates", "type": "uint64"}, {
-            "internalType": "uint64",
-            "name": "businessRoleArbitrates",
-            "type": "uint64"
-        }, {"internalType": "uint8[]", "name": "labels", "type": "uint8[]"}],
-        "internalType": "struct OTC.Kyc",
-        "name": "",
-        "type": "tuple"
-    }],
-    "stateMutability": "view",
-    "type": "function"
-}, {
-    "inputs": [{"internalType": "bytes", "name": "pcode", "type": "bytes"}],
-    "name": "needAuditing",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-}, {
-    "inputs": [{"internalType": "uint256", "name": "id", "type": "uint256"}],
-    "name": "orderInfo",
-    "outputs": [{
-        "components": [{
-            "internalType": "address",
-            "name": "owner",
-            "type": "address"
-        }, {"internalType": "uint256", "name": "businessOrderId", "type": "uint256"}, {
-            "internalType": "uint256",
-            "name": "value",
-            "type": "uint256"
-        }, {"internalType": "uint256", "name": "price", "type": "uint256"}, {
-            "internalType": "bytes32",
-            "name": "token",
-            "type": "bytes32"
-        }, {"internalType": "uint256", "name": "createTime", "type": "uint256"}, {
-            "internalType": "uint256",
-            "name": "updateTime",
-            "type": "uint256"
-        }, {"internalType": "uint8", "name": "payType", "type": "uint8"}, {
-            "internalType": "enum Types.OrderStatus",
-            "name": "status",
-            "type": "uint8"
-        }, {"internalType": "enum Types.OrderType", "name": "orderType", "type": "uint8"}],
-        "internalType": "struct Types.UserOrder",
-        "name": "",
-        "type": "tuple"
-    }],
-    "stateMutability": "view",
-    "type": "function"
-}, {
-    "inputs": [],
-    "name": "owner",
-    "outputs": [{"internalType": "address", "name": "", "type": "address"}],
-    "stateMutability": "view",
-    "type": "function"
-}, {
-    "inputs": [{"internalType": "uint256", "name": "userOrderId", "type": "uint256"}],
-    "name": "refused",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-}, {
-    "inputs": [{"internalType": "string", "name": "name", "type": "string"}, {
-        "internalType": "bytes32",
-        "name": "hcode",
-        "type": "bytes32"
-    }, {"internalType": "bytes32", "name": "ecode", "type": "bytes32"}, {
-        "internalType": "bytes",
-        "name": "pcode",
-        "type": "bytes"
-    }], "name": "registerKyc", "outputs": [], "stateMutability": "nonpayable", "type": "function"
-}, {
-    "inputs": [{"internalType": "address", "name": "_auditor", "type": "address"}],
-    "name": "setAuditor",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-}, {
-    "inputs": [{"internalType": "address", "name": "newOwner", "type": "address"}],
-    "name": "transferOwnership",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-}, {
-    "inputs": [{"internalType": "uint256", "name": "orderId", "type": "uint256"}, {
-        "internalType": "uint256",
-        "name": "price",
-        "type": "uint256"
-    }], "name": "updatePrice", "outputs": [], "stateMutability": "nonpayable", "type": "function"
-}, {
-    "inputs": [{"internalType": "uint256", "name": "userOrderId", "type": "uint256"}],
-    "name": "userCancel",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-}, {
-    "inputs": [], "name": "userOrderList", "outputs": [{
-        "components": [{
-            "internalType": "uint256",
-            "name": "id",
-            "type": "uint256"
-        }, {
-            "components": [{"internalType": "address", "name": "owner", "type": "address"}, {
-                "internalType": "uint256",
-                "name": "businessOrderId",
-                "type": "uint256"
-            }, {"internalType": "uint256", "name": "value", "type": "uint256"}, {
-                "internalType": "uint256",
-                "name": "price",
-                "type": "uint256"
-            }, {"internalType": "bytes32", "name": "token", "type": "bytes32"}, {
-                "internalType": "uint256",
-                "name": "createTime",
-                "type": "uint256"
-            }, {"internalType": "uint256", "name": "updateTime", "type": "uint256"}, {
-                "internalType": "uint8",
-                "name": "payType",
-                "type": "uint8"
-            }, {
-                "internalType": "enum Types.OrderStatus",
-                "name": "status",
-                "type": "uint8"
-            }, {"internalType": "enum Types.OrderType", "name": "orderType", "type": "uint8"}],
-            "internalType": "struct Types.UserOrder",
-            "name": "order",
-            "type": "tuple"
-        }, {"internalType": "bytes32", "name": "hcode", "type": "bytes32"}, {
-            "internalType": "bytes",
-            "name": "mcode",
-            "type": "bytes"
-        }, {"internalType": "uint256", "name": "arbitration", "type": "uint256"}, {
-            "internalType": "string",
-            "name": "name",
-            "type": "string"
-        }], "internalType": "struct Types.RetUserOrder[]", "name": "rets", "type": "tuple[]"
-    }], "stateMutability": "view", "type": "function"
-}, {
-    "inputs": [{"internalType": "uint256", "name": "bid", "type": "uint256"}],
-    "name": "userOrderListByBId",
-    "outputs": [{
-        "components": [{
-            "internalType": "uint256",
-            "name": "id",
-            "type": "uint256"
-        }, {
-            "components": [{"internalType": "address", "name": "owner", "type": "address"}, {
-                "internalType": "uint256",
-                "name": "businessOrderId",
-                "type": "uint256"
-            }, {"internalType": "uint256", "name": "value", "type": "uint256"}, {
-                "internalType": "uint256",
-                "name": "price",
-                "type": "uint256"
-            }, {"internalType": "bytes32", "name": "token", "type": "bytes32"}, {
-                "internalType": "uint256",
-                "name": "createTime",
-                "type": "uint256"
-            }, {"internalType": "uint256", "name": "updateTime", "type": "uint256"}, {
-                "internalType": "uint8",
-                "name": "payType",
-                "type": "uint8"
-            }, {
-                "internalType": "enum Types.OrderStatus",
-                "name": "status",
-                "type": "uint8"
-            }, {"internalType": "enum Types.OrderType", "name": "orderType", "type": "uint8"}],
-            "internalType": "struct Types.UserOrder",
-            "name": "order",
-            "type": "tuple"
-        }, {"internalType": "bytes32", "name": "hcode", "type": "bytes32"}, {
-            "internalType": "bytes",
-            "name": "mcode",
-            "type": "bytes"
-        }, {"internalType": "uint256", "name": "arbitration", "type": "uint256"}, {
-            "internalType": "string",
-            "name": "name",
-            "type": "string"
-        }], "internalType": "struct Types.RetUserOrder[]", "name": "rets", "type": "tuple[]"
-    }],
-    "stateMutability": "view",
-    "type": "function"
-}];
+const abiJson = [{"inputs":[{"internalType":"address","name":"_auditor","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"inputs":[{"internalType":"bytes32","name":"hcode","type":"bytes32"},{"internalType":"uint8","name":"label","type":"uint8"}],"name":"addLable","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_manager","type":"address"}],"name":"addManager","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"string","name":"token","type":"string"},{"internalType":"uint8","name":"unit","type":"uint8"}],"name":"addToken","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"userOrderId","type":"uint256"}],"name":"arbitrate","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"arbitrateOrders","outputs":[{"components":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"bytes32","name":"hcode","type":"bytes32"},{"internalType":"bytes","name":"mcode","type":"bytes"},{"internalType":"uint256","name":"arbitration","type":"uint256"},{"internalType":"uint8","name":"unit","type":"uint8"},{"internalType":"string","name":"name","type":"string"},{"components":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"uint256","name":"businessOrderId","type":"uint256"},{"internalType":"uint256","name":"value","type":"uint256"},{"internalType":"uint256","name":"price","type":"uint256"},{"internalType":"bytes32","name":"token","type":"bytes32"},{"internalType":"uint256","name":"createTime","type":"uint256"},{"internalType":"uint256","name":"updateTime","type":"uint256"},{"internalType":"uint8","name":"payType","type":"uint8"},{"internalType":"enum Types.OrderStatus","name":"status","type":"uint8"},{"internalType":"enum Types.OrderType","name":"orderType","type":"uint8"}],"internalType":"struct Types.UserOrder","name":"order","type":"tuple"}],"internalType":"struct Types.RetUserOrder[]","name":"rets","type":"tuple[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32[]","name":"hcodes","type":"bytes32[]"},{"internalType":"bool","name":"status","type":"bool"}],"name":"audited","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"auditingList","outputs":[{"components":[{"internalType":"bytes32","name":"hcode","type":"bytes32"},{"internalType":"bytes","name":"pcode","type":"bytes"}],"internalType":"struct OTC.RetAuditedInfo[]","name":"rets","type":"tuple[]"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"auditor","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"tokenName","type":"string"},{"internalType":"uint256","name":"value","type":"uint256"},{"internalType":"uint256","name":"minDealValue","type":"uint256"},{"internalType":"uint256","name":"maxDealVlaue","type":"uint256"},{"internalType":"uint256","name":"price","type":"uint256"},{"internalType":"uint8","name":"unit","type":"uint8"},{"internalType":"string","name":"information","type":"string"}],"name":"businessBuy","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"orderId","type":"uint256"}],"name":"businessCancel","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"string","name":"tokenName","type":"string"},{"internalType":"uint8","name":"unit","type":"uint8"},{"internalType":"bool","name":"myself","type":"bool"}],"name":"businessOrderList","outputs":[{"components":[{"internalType":"uint256","name":"id","type":"uint256"},{"components":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"bytes32","name":"token","type":"bytes32"},{"internalType":"uint256","name":"value","type":"uint256"},{"internalType":"uint256","name":"dealtValue","type":"uint256"},{"internalType":"uint256","name":"lockinValue","type":"uint256"},{"internalType":"uint256","name":"minDealValue","type":"uint256"},{"internalType":"uint256","name":"maxDealValue","type":"uint256"},{"internalType":"uint256","name":"price","type":"uint256"},{"internalType":"uint256","name":"timestemp","type":"uint256"},{"internalType":"uint8","name":"unit","type":"uint8"},{"internalType":"enum Types.OrderType","name":"orderType","type":"uint8"},{"internalType":"enum Types.OrderStatus","name":"status","type":"uint8"},{"internalType":"string","name":"information","type":"string"}],"internalType":"struct Types.BusinessOrder","name":"order","type":"tuple"},{"internalType":"string","name":"name","type":"string"},{"internalType":"bytes32","name":"hcode","type":"bytes32"},{"internalType":"uint256","name":"underwayCount","type":"uint256"},{"internalType":"uint256","name":"deals","type":"uint256"},{"internalType":"uint256","name":"arbitration","type":"uint256"},{"internalType":"uint8[]","name":"labels","type":"uint8[]"}],"internalType":"struct Types.RetBusinessOrder[]","name":"rets","type":"tuple[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"minDealValue","type":"uint256"},{"internalType":"uint256","name":"maxDealVlaue","type":"uint256"},{"internalType":"uint256","name":"price","type":"uint256"},{"internalType":"uint8","name":"unit","type":"uint8"},{"internalType":"string","name":"information","type":"string"}],"name":"businessSell","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"uint256","name":"userOrderId","type":"uint256"},{"internalType":"bytes","name":"mcode","type":"bytes"}],"name":"confirmed","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes","name":"mcode","type":"bytes"},{"internalType":"uint256","name":"orderId","type":"uint256"},{"internalType":"uint256","name":"value","type":"uint256"},{"internalType":"uint8","name":"payType","type":"uint8"}],"name":"exchangeBuy","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes","name":"mcode","type":"bytes"},{"internalType":"uint256","name":"orderId","type":"uint256"},{"internalType":"uint8","name":"payType","type":"uint8"}],"name":"exchangeSell","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"uint256","name":"userOrderId","type":"uint256"},{"internalType":"uint8","name":"winRole","type":"uint8"}],"name":"executeArbitrate","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"userOrderId","type":"uint256"}],"name":"finished","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes32","name":"hcode","type":"bytes32"}],"name":"invalidAudited","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"myKyc","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"},{"internalType":"uint8","name":"","type":"uint8"},{"components":[{"internalType":"string","name":"name","type":"string"},{"internalType":"uint64","name":"deals","type":"uint64"},{"internalType":"uint64","name":"userRoleArbitrates","type":"uint64"},{"internalType":"uint64","name":"businessRoleArbitrates","type":"uint64"},{"internalType":"uint8[]","name":"labels","type":"uint8[]"}],"internalType":"struct OTC.Kyc","name":"","type":"tuple"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes","name":"pcode","type":"bytes"}],"name":"needAuditing","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"id","type":"uint256"}],"name":"orderInfo","outputs":[{"components":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"bytes32","name":"hcode","type":"bytes32"},{"internalType":"bytes","name":"mcode","type":"bytes"},{"internalType":"uint256","name":"arbitration","type":"uint256"},{"internalType":"uint8","name":"unit","type":"uint8"},{"internalType":"string","name":"name","type":"string"},{"components":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"uint256","name":"businessOrderId","type":"uint256"},{"internalType":"uint256","name":"value","type":"uint256"},{"internalType":"uint256","name":"price","type":"uint256"},{"internalType":"bytes32","name":"token","type":"bytes32"},{"internalType":"uint256","name":"createTime","type":"uint256"},{"internalType":"uint256","name":"updateTime","type":"uint256"},{"internalType":"uint8","name":"payType","type":"uint8"},{"internalType":"enum Types.OrderStatus","name":"status","type":"uint8"},{"internalType":"enum Types.OrderType","name":"orderType","type":"uint8"}],"internalType":"struct Types.UserOrder","name":"order","type":"tuple"}],"internalType":"struct Types.RetUserOrder","name":"ret","type":"tuple"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"userOrderId","type":"uint256"}],"name":"refused","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"bytes32","name":"hcode","type":"bytes32"},{"internalType":"bytes32","name":"ecode","type":"bytes32"},{"internalType":"bytes","name":"pcode","type":"bytes"}],"name":"registerKyc","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_auditor","type":"address"}],"name":"setAuditor","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"orderId","type":"uint256"},{"internalType":"uint256","name":"price","type":"uint256"}],"name":"updatePrice","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"userOrderId","type":"uint256"}],"name":"userCancel","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"userOrderList","outputs":[{"components":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"bytes32","name":"hcode","type":"bytes32"},{"internalType":"bytes","name":"mcode","type":"bytes"},{"internalType":"uint256","name":"arbitration","type":"uint256"},{"internalType":"uint8","name":"unit","type":"uint8"},{"internalType":"string","name":"name","type":"string"},{"components":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"uint256","name":"businessOrderId","type":"uint256"},{"internalType":"uint256","name":"value","type":"uint256"},{"internalType":"uint256","name":"price","type":"uint256"},{"internalType":"bytes32","name":"token","type":"bytes32"},{"internalType":"uint256","name":"createTime","type":"uint256"},{"internalType":"uint256","name":"updateTime","type":"uint256"},{"internalType":"uint8","name":"payType","type":"uint8"},{"internalType":"enum Types.OrderStatus","name":"status","type":"uint8"},{"internalType":"enum Types.OrderType","name":"orderType","type":"uint8"}],"internalType":"struct Types.UserOrder","name":"order","type":"tuple"}],"internalType":"struct Types.RetUserOrder[]","name":"rets","type":"tuple[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"bid","type":"uint256"}],"name":"userOrderListByBId","outputs":[{"components":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"bytes32","name":"hcode","type":"bytes32"},{"internalType":"bytes","name":"mcode","type":"bytes"},{"internalType":"uint256","name":"arbitration","type":"uint256"},{"internalType":"uint8","name":"unit","type":"uint8"},{"internalType":"string","name":"name","type":"string"},{"components":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"uint256","name":"businessOrderId","type":"uint256"},{"internalType":"uint256","name":"value","type":"uint256"},{"internalType":"uint256","name":"price","type":"uint256"},{"internalType":"bytes32","name":"token","type":"bytes32"},{"internalType":"uint256","name":"createTime","type":"uint256"},{"internalType":"uint256","name":"updateTime","type":"uint256"},{"internalType":"uint8","name":"payType","type":"uint8"},{"internalType":"enum Types.OrderStatus","name":"status","type":"uint8"},{"internalType":"enum Types.OrderType","name":"orderType","type":"uint8"}],"internalType":"struct Types.UserOrder","name":"order","type":"tuple"}],"internalType":"struct Types.RetUserOrder[]","name":"rets","type":"tuple[]"}],"stateMutability":"view","type":"function"}];
 
-const contract = serojs.callContract(abiJson, "kcxcoNF22ZssXCGPdN58Ar1P8FsB6cF5vmRzTVNyWCD9viRWvo9jKDfT7ckdEMxnFXSrjZxWbzyLpzNxy4iSUoV");
+const contract = serojs.callContract(abiJson, "25S2YrgyHGKHytGwxgvqXLp5LwyP1eqNhBQ6g8mrxsQCJAw1ftMjxCVuDUPNDdSgpaZU4Fxo5E7EdbvXZv6SZzAv");
 
 const rpc = new JsonRpc();
 
@@ -469,7 +45,11 @@ class OAbi {
     }
 
     unitName(unit) {
-        return unitMap.get(unit);
+        if(unitMap.has(Number(unit))) {
+            return unitMap.get(Number(unit));
+        }
+        return  "SSS";
+
     }
 
     tokenList(unit) {
@@ -527,10 +107,17 @@ class OAbi {
 
     getPayTypes(code2, callback) {
         let param = {name: "profile.getByCode2", data: {code2: code2}};
-        rpc.post("https://api.ahoj.xyz/api", JSON.stringify(param), function (ret) {
-            console.log("getPayTypes", ret);
-            if (ret.state == "succ") {
-                callback(ret.data.pcMethods);
+        rpc.post("https://api.ahoj.xyz/api", JSON.stringify(param), 3000, function (ret, err) {
+            if (err) {
+                callback([{type: "ALL", channel: "ALL", account: "ALL", index: 999}]);
+            } else if (ret.state == "succ") {
+                let list = [];
+                ret.data.pcMethods.forEach((item, index) => {
+                    if (!item.disabled) {
+                        list.push({type: item.type, channel: item.channel, account: item.account, index: index});
+                    }
+                });
+                callback(list);
             }
         });
     }
@@ -618,7 +205,6 @@ class OAbi {
     }
 
     getFullAddress(pkrs, callback) {
-        console.log(pkrs);
         rpc.seroRpc("http://150.158.109.143:8545", "sero_getFullAddress", [pkrs], function (rets) {
             callback(rets);
         });
@@ -644,7 +230,6 @@ class OAbi {
         this.callMethod(contract, 'myKyc', from, [], function (rets) {
             if (rets[0] != "0x0000000000000000000000000000000000000000000000000000000000000000") {
                 self.pkrCrypto(pk, from, rets[0], function (code) {
-                    console.log("myKyc", rets);
                     callback(code, rets[1]);
                 })
             } else {
@@ -668,7 +253,6 @@ class OAbi {
 
     businessOrderList(from, tokenName, unit, flag, callback) {
         this.callMethod(contract, 'businessOrderList', from, [tokenName, unit, flag], function (ret) {
-            console.log("businessOrderList", from, tokenName, unit, flag, ret);
             callback(ret.rets);
         });
     }
@@ -726,11 +310,11 @@ class OAbi {
     }
 
     businessSell(pk, mainPKr, tokenName, value, minValue, maxValue, price, unit, callback) {
-        this.executeMethod(contract, 'businessSell', pk, mainPKr, [this.bigToHex(minValue), this.bigToHex(maxValue), this.bigToHex(price), unit], tokenName, value, callback);
+        this.executeMethod(contract, 'businessSell', pk, mainPKr, [this.bigToHex(minValue), this.bigToHex(maxValue), this.bigToHex(price), unit, ""], tokenName, value, callback);
     }
 
     businessBuy(pk, mainPKr, tokenName, value, minValue, maxValue, price, unit, callback) {
-        this.executeMethod(contract, 'businessBuy', pk, mainPKr, [tokenName, this.bigToHex(value), this.bigToHex(minValue), this.bigToHex(maxValue), this.bigToHex(price), unit], "SERO", 0, callback);
+        this.executeMethod(contract, 'businessBuy', pk, mainPKr, [tokenName, this.bigToHex(value), this.bigToHex(minValue), this.bigToHex(maxValue), this.bigToHex(price), unit, ""], "SERO", 0, callback);
     }
 
     refused(pk, mainPKr, orderId, callback) {
