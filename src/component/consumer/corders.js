@@ -116,7 +116,7 @@ export class COrders extends Component {
                 }
             </span>
             return <div className="item" key={index}>
-                <WhiteSpace/>
+
                 <Card>
                     <Card.Header
                         title={
@@ -170,6 +170,7 @@ export class COrders extends Component {
                          </span>
                     </div>}/>
                 </Card>
+
             </div>
         });
         return (

@@ -162,7 +162,7 @@ export class UserOrders extends Component {
                 html = <span>{text}</span>
             }
 
-            return <div key={index}>
+            return <div className="item" key={index}>
                 <Card>
                     <Card.Header
                         title={<span>订单号:{child.id}</span>}
@@ -191,7 +191,6 @@ export class UserOrders extends Component {
                         }}>支付信息</a>
                     </span>}/>
                 </Card>
-                <WhiteSpace size="sm"/>
             </div>
 
         });
@@ -222,7 +221,10 @@ export class UserOrders extends Component {
                     </Flex>
                     <WhiteSpace/>
                 </div>
-                {ordersHtml}
+                <div className="ui list">
+                    {ordersHtml}
+                </div>
+
             </div>
 
 

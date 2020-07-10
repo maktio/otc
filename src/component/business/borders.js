@@ -135,7 +135,6 @@ export class BOrders extends Component {
                             }}> {item.underwayCount}</a>
                         </span>}/>
                     </Card>
-                    <WhiteSpace/>
                 </div>
 
             )
