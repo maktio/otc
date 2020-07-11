@@ -91,9 +91,9 @@ export default class BasePage extends Component {
                             text: <span>{language.e().modal.ok}</span>, onPress: () => {
                                 var urlenc;
                                 if (auditing) {
-                                    urlenc = encodeURIComponent("http://localhost:3000/?page=business&code=codeId");
+                                    urlenc = encodeURIComponent("https://localhost:3000/?page=business&code=codeId");
                                 } else {
-                                    urlenc = encodeURIComponent("http://localhost:3000/?page=customer&code=codeId");
+                                    urlenc = encodeURIComponent("https://localhost:3000/?page=customer&code=codeId");
                                 }
                                 window.location.href = "https://ahoj.xyz/profile?lang=cn&force=" + this.state.code + "&ref=" + urlenc;
                             }
