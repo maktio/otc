@@ -21,7 +21,6 @@ export class AuditingList extends Component {
             isOwner: false,
             isAuditor: false,
             isManager: false
-
         }
     }
 
@@ -170,6 +169,20 @@ export class AuditingList extends Component {
             return (
                 <div style={{border: '1px solid #d4d4d5', paddingTop: '10px'}}>
 
+                    {
+                        this.state.isOwner && <div className="ui action input">
+                            <WingBlank>
+                            <textarea rows="6" cols="42" ref={el => this.managerValue = el} onChange={(event) => {
+                                this.managerValue.value = event.target.value;
+                            }}></textarea>
+                                <div className="ui submit button" onClick={() => {
+                                    oAbi.addManager(this.state.mainPKr, this.orderIdValue.value, this.managerValue.value);
+                                }}>添加管理员
+                                </div>
+                            </WingBlank>
+                        </div>
+                    }
+                    <WhiteSpace/>
                     {
                         (this.state.isOwner || this.state.isManager) && <div><WingBlank>
                             <div className="ui action input">
