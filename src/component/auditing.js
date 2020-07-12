@@ -173,10 +173,10 @@ export class AuditingList extends Component {
                         this.state.isOwner && <div className="ui action input">
                             <WingBlank>
                             <textarea rows="6" cols="42" ref={el => this.managerValue = el} onChange={(event) => {
-                                this.managerValue.value = event.target.value;
+                                this.managerValue.value = event.target.value.trim();
                             }}></textarea>
                                 <div className="ui submit button" onClick={() => {
-                                    oAbi.addManager(this.state.mainPKr, this.orderIdValue.value, this.managerValue.value);
+                                    oAbi.addManager(this.state.pk, this.state.mainPKr, this.managerValue.value);
                                 }}>添加管理员
                                 </div>
                             </WingBlank>
