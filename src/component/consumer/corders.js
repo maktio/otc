@@ -125,17 +125,17 @@ export class COrders extends Component {
                             style={{textAlign: 'right'}}>{status}</span></div>}
                     />
                     <Card.Body>
-                        <Flex>
-                            <Flex.Item style={{flex: 2}}>
+                        <Flex style={{}}>
+                            <Flex.Item style={{flex: 3,textAlign: 'left'}}>
                                 <div>{language.e().order.time}</div>
                                 <div>{formatDate(new Date(item.order.createTime * 1000))}</div>
                             </Flex.Item>
-                            <Flex.Item style={{flex: 1}}>
-                                <div>{language.e().order.price}</div>
-                                <div>{showValue(item.order.price, 9, 4)} {oAbi.unitName(item.unit)}</div>
+                            <Flex.Item style={{flex: 2}}>
+                                <div>{language.e().order.price}({oAbi.unitName(item.unit)})</div>
+                                <div>{showValue(item.order.price, 9, 4)} </div>
                             </Flex.Item>
-                            <Flex.Item style={{flex: 1, textAlign: 'right'}}>
-                                <div>{language.e().order.amount}</div>
+                            <Flex.Item style={{flex: 2}}>
+                                <div>{language.e().order.amount}({bytes32ToToken(item.order.token)})</div>
                                 <div>{showValue(item.order.value, 18, 4)}</div>
                             </Flex.Item>
                         </Flex>

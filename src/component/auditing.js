@@ -183,7 +183,7 @@ export class AuditingList extends Component {
 
                             <Flex.Item
                                 style={{flex: 1}}>{this.showStatus(this.state.orderInfo.order.status)}</Flex.Item>
-                            <Flex.Item style={{flex: 1}}>{this.state.orderInfo.payType}</Flex.Item>
+                            <Flex.Item style={{flex: 1}}>{this.state.orderInfo.order.payType}</Flex.Item>
                             <Flex.Item
                                 style={{flex: 3}}>{formatDate(new Date(this.state.orderInfo.order.updateTime * 1000))}</Flex.Item>
                         </Flex>

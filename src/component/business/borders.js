@@ -128,7 +128,7 @@ export class BOrders extends Component {
 
                             </div>
                         </Card.Body>
-                        <Card.Footer content="footer content" extra={<span>
+                        <Card.Footer extra={<span>
                             处理中订单数量
                             <a onClick={() => {
                                 self.setState({orderId: item.id, orderType: item.order.orderType});

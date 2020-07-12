@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import oAbi from "./oabi";
 import {Modal, WhiteSpace} from "antd-mobile";
-import {hash, randomByte32} from "./common";
+import {hash, randomByte32, urlParse} from "./common";
 import language from './language'
 import * as cookie from "react-cookies";
 
@@ -26,7 +26,7 @@ export default class BasePage extends Component {
             <div>
                 <div className="ui input"><input type="text" placeholder="name"
                                                  onChange={(event) => {
-                                                     self.nameValue.value = event.target.value;
+                                                     self.nameValue.value = event.target.value.trim();
                                                  }}
                                                  ref={el => self.nameValue = el}/></div>
                 <WhiteSpace/>
@@ -51,14 +51,14 @@ export default class BasePage extends Component {
                         let code2 = oAbi.code2(code1);
                         oAbi.pkrCrypto(self.state.pk, self.state.mainPKr, code, function (ecode, err) {
                             if (err) {
-                                Modal.alert('', '不支持老PK',);
+                                Modal.alert('', '不支持老账户',);
                                 return;
                             }
                             if (auditing) {
                                 oAbi.auditor(self.state.mainPKr, function (auditor) {
                                     oAbi.pkrEncrypt(auditor, code1, function (pcode, err) {
                                         if (err) {
-                                            Modal.alert('', '不支持老PK',);
+                                            Modal.alert('', '不支持老账户',);
                                             return;
                                         }
 

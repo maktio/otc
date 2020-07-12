@@ -78,7 +78,7 @@ export class PlaceOrder extends BasePage {
             price = 1;
             showOrders = this.state.buyOrders;
         } else {
-            price = 1.005
+            price = 1.003
             showOrders = this.state.sellOrders;
         }
 
@@ -112,19 +112,19 @@ export class PlaceOrder extends BasePage {
                             <div className="text">{oAbi.unitName(this.state.unit)}</div>
                             <i className="dropdown icon"></i>
                             <div className="menu transition hidden" ref={el => this.menu = el}>
+                                {/*<div className="item" onClick={(e) => {*/}
+                                {/*    this.dropdown.className = "ui dropdown ";*/}
+                                {/*    this.menu.className = "menu transition hidden";*/}
+                                {/*    this.setState({unit: 0, showSelect: false});*/}
+                                {/*    this.init(this.state.mainPKr, null, 0);*/}
+                                {/*    e.stopPropagation()*/}
+                                {/*}}>CNY*/}
+                                {/*</div>*/}
                                 <div className="item" onClick={(e) => {
                                     this.dropdown.className = "ui dropdown ";
                                     this.menu.className = "menu transition hidden";
                                     this.setState({unit: 0, showSelect: false});
                                     this.init(this.state.mainPKr, null, 0);
-                                    e.stopPropagation()
-                                }}>CNY
-                                </div>
-                                <div className="item" onClick={(e) => {
-                                    this.dropdown.className = "ui dropdown ";
-                                    this.menu.className = "menu transition hidden";
-                                    this.setState({unit: 1, showSelect: false});
-                                    this.init(this.state.mainPKr, null, 1);
                                     e.stopPropagation();
                                 }}>USD
                                 </div>

@@ -56,44 +56,34 @@ export class UserOrders extends Component {
         let ordersHtml = this.state.orders.map((child, index) => {
             let html;
             if (child.order.status == 1) {
-                html = <div style={{textAlign: 'right'}}>
-                    <a onClick={() => {
-                        alert(language.e().order.confirm + "/" + language.e().order.refuse,
-                            <Flex>
-                                <Flex.Item style={{textAlign: "right"}}>
-                                    <div className="ui radio checkbox">
-                                        <input type="radio" ref={el => this.conform = el} name="op"
-                                               checked="checked" onChange={() => {
-                                        }}/>
-                                        <label>{language.e().order.confirm}</label>
-                                    </div>
-                                </Flex.Item>
-                                <Flex.Item>
-                                    <div className="ui radio checkbox">
-                                        <input type="radio" ref={el => this.refuse = el} name="op"
-                                               onChange={() => {
-                                               }}/>
-                                        <label>{language.e().order.refuse}</label>
-                                    </div>
-                                </Flex.Item>
-                            </Flex>
+                html = <div className="ui breadcrumb">
+                    <a className="section" onClick={() => {
+                        alert(language.e().order.confirm, ''
                             , [
                                 {text: language.e().modal.cancel, onPress: () => console.log('cancel')},
                                 {
                                     text: language.e().modal.ok, onPress: () => {
-                                        if (this.conform.checked) {
-                                            oAbi.pkrEncrypt(child.pkr, oAbi.code1(code), function (mcode) {
-                                                oAbi.confirmed(self.state.pk, self.state.mainPKr, child.id, mcode);
-                                            });
-                                        } else {
-                                            oAbi.refused(self.state.pk, self.state.mainPKr, child.id);
-                                        }
+
+                                        oAbi.pkrEncrypt(child.pkr, oAbi.code1(code), function (mcode) {
+                                            oAbi.confirmed(self.state.pk, self.state.mainPKr, child.id, mcode);
+                                        });
+
                                     }
                                 },
                             ]);
-                    }}>
-                        {language.e().order.confirm}/{language.e().order.refuse}
-                    </a>
+                    }}>{language.e().order.confirm}</a>
+                    <div className="divider"></div>
+                    <a className="section" onClick={() => {
+                        alert(language.e().order.refuse, ""
+                            , [
+                                {text: language.e().modal.cancel, onPress: () => console.log('cancel')},
+                                {
+                                    text: language.e().modal.ok, onPress: () => {
+                                        oAbi.refused(self.state.pk, self.state.mainPKr, child.id);
+                                    }
+                                },
+                            ]);
+                    }}>{language.e().order.refuse}</a>
                 </div>
             } else if (child.order.status == 2) {
                 let value = new BigNumber(child.order.price).multipliedBy(child.order.value).dividedBy(new BigNumber(10).pow(27)).toNumber();
@@ -165,7 +155,13 @@ export class UserOrders extends Component {
             return <div className="item" key={index}>
                 <Card>
                     <Card.Header
-                        title={<span>订单号:{child.id}</span>}
+                        title={
+                            <div className="ui breadcrumb">
+                                <div className="section">ID:{child.id}</div>
+                                <div className="divider"></div>
+                                <div className="active section">{child.name}</div>
+                            </div>
+                        }
                         extra={html}
                     />
                     <Card.Body>

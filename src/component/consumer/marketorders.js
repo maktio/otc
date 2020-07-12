@@ -129,7 +129,7 @@ export class MarketOrders extends BasePage {
                             title={item.name}
                             extra={
                                 <div className="ui breadcrumb">
-                                    <div className="section">仲裁:{item.arbitration} 成交:{item.deals}</div>
+                                    <div className="section">败诉:{item.arbitration} 成交:{item.deals}</div>
                                     <div className="divider"></div>
                                     <div className="active section">
                                         <a onClick={() => {
@@ -158,7 +158,7 @@ export class MarketOrders extends BasePage {
                                         let payMethods = []
                                         oAbi.getPayTypes(item.hcode, function (list) {
                                             list.forEach((item) => {
-                                                payMethods.push(<Flex>
+                                                payMethods.push(<Flex key={item.index}>
                                                     <Flex.Item>{item.type}</Flex.Item>
                                                     <Flex.Item>{item.account}</Flex.Item>
                                                     <Flex.Item>{item.channel}</Flex.Item>
@@ -224,20 +224,16 @@ export class MarketOrders extends BasePage {
                             <span>单价:{showValue(this.state.price, 9, 4)}{oAbi.unitName(this.state.unit)}</span>
                         </List.Item>
                         <List.Item>
-                            <div>
-                                <select className="ui selection dropdown"
-                                        ref={el => this.amountValue = el}
-                                        onChange={(e) => {
-                                            this.amountValue.value = e.target.value;
-                                        }}>
-                                    <option key={0} value={100}>100</option>
-                                    <option key={1} value={200}>200</option>
-                                    <option key={2} value={500}>500</option>
-                                    <option key={3} value={1000}>1000</option>
-                                    <option key={4} value={5000}>5000</option>
-                                    <option key={5} value={10000}>10000</option>
-                                    <option key={6} value={30000}>30000</option>
-                                </select>
+                            <div className="ui icon input" style={{width: "100%"}}>
+                                <input type="text" placeholder="amount" ref={el => this.amountValue = el}
+                                       onChange={(event) => {
+                                           let value = event.target.value;
+                                           if (value) {
+                                               value = (value.match(/^\d*(\.?\d{0,4})/g)[0]) || null
+                                           }
+                                           this.amountValue.value = value;
+                                       }}/>
+                                <i className="icon" style={{top: '12px',color:"#000"}}>{this.state.token}</i>
                             </div>
                         </List.Item>
                         {payTypeItems}
@@ -256,6 +252,12 @@ export class MarketOrders extends BasePage {
                                             Toast.fail("输入金额为0");
                                             return;
                                         }
+
+                                        if (amount < 10e18) {
+                                            Toast.fail("输入金额为0");
+                                            return;
+                                        }
+
                                         if (amount > this.state.maxValue) {
                                             Toast.fail("超出可交易范围!");
                                             return;
@@ -283,19 +285,19 @@ export class MarketOrders extends BasePage {
                             <div className="text">{oAbi.unitName(this.state.unit)}</div>
                             <i className="dropdown icon"></i>
                             <div className="menu transition hidden" ref={el => this.menu = el}>
+                                {/*<div className="item" onClick={(e) => {*/}
+                                {/*    this.dropdown.className = "ui dropdown ";*/}
+                                {/*    this.menu.className = "menu transition hidden";*/}
+                                {/*    this.setState({unit: 0, showSelect: false});*/}
+                                {/*    this.init(this.state.mainPKr, null, 0);*/}
+                                {/*    e.stopPropagation()*/}
+                                {/*}}>CNY*/}
+                                {/*</div>*/}
                                 <div className="item" onClick={(e) => {
                                     this.dropdown.className = "ui dropdown ";
                                     this.menu.className = "menu transition hidden";
                                     this.setState({unit: 0, showSelect: false});
                                     this.init(this.state.mainPKr, null, 0);
-                                    e.stopPropagation()
-                                }}>CNY
-                                </div>
-                                <div className="item" onClick={(e) => {
-                                    this.dropdown.className = "ui dropdown ";
-                                    this.menu.className = "menu transition hidden";
-                                    this.setState({unit: 1, showSelect: false});
-                                    this.init(this.state.mainPKr, null, 1);
                                     e.stopPropagation();
                                 }}>USD
                                 </div>
