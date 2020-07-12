@@ -49,10 +49,19 @@ export default class BasePage extends Component {
                         let name = self.nameValue.value;
                         let code1 = oAbi.code1(code);
                         let code2 = oAbi.code2(code1);
-                        oAbi.pkrCrypto(self.state.pk, self.state.mainPKr, code, function (ecode) {
+                        oAbi.pkrCrypto(self.state.pk, self.state.mainPKr, code, function (ecode, err) {
+                            if (err) {
+                                Modal.alert('', '不支持老PK',);
+                                return;
+                            }
                             if (auditing) {
                                 oAbi.auditor(self.state.mainPKr, function (auditor) {
-                                    oAbi.pkrEncrypt(auditor, code1, function (pcode) {
+                                    oAbi.pkrEncrypt(auditor, code1, function (pcode, err) {
+                                        if (err) {
+                                            Modal.alert('', '不支持老PK',);
+                                            return;
+                                        }
+
                                         oAbi.registerKyc(self.state.pk, self.state.mainPKr, name, code2, ecode, pcode, function (res, error) {
                                             window.location.href = document.location.origin + document.location.pathname;
                                         });
@@ -87,11 +96,12 @@ export default class BasePage extends Component {
                         {text: <span>{language.e().modal.cancel}</span>},
                         {
                             text: <span>{language.e().modal.ok}</span>, onPress: () => {
+                                let host = document.location.origin + document.location.pathname;
                                 var urlenc;
                                 if (auditing) {
-                                    urlenc = encodeURIComponent(document.URL + "/?page=business&code=codeId");
+                                    urlenc = encodeURIComponent(host + "/?page=business&code=codeId");
                                 } else {
-                                    urlenc = encodeURIComponent(document.URL + "/?page=customer&code=codeId");
+                                    urlenc = encodeURIComponent(host + "/?page=customer&code=codeId");
                                 }
                                 window.location.href = "https://ahoj.xyz/profile?lang=cn&force=" + this.state.code + "&ref=" + urlenc;
                             }

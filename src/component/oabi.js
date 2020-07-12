@@ -10,10 +10,10 @@ import React from "react";
 const B2B = require("blake2b")
 
 const config = {
-    name: "OTC",
+    name: "MAKT",
     contractAddress: "3yX8RpbkKW6sTtBC48scYC74HoW17Jy7w2U8dfp4441JWguxq4HF4tNCygdVZoSQ2GU4o1YuY6DwQBEGxb45tvMY",
     github: "https://github.com/maktio/otc",
-    author: "otc",
+    author: "maktio",
     url: document.location.href,
     logo: document.location.protocol + '//' + document.location.host + '/logo.png'
 };
