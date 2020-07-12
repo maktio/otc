@@ -142,7 +142,6 @@ export default class BasePage extends Component {
 
     componentDidMount() {
         let url = document.URL;
-        console.log("document.URL", document.URL);
         let code0;
         let index = url.indexOf("code=");
         if (index != -1) {

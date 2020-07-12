@@ -38,7 +38,6 @@ class App extends Component {
             mainPKr: localStorage.getItem("MAINPKR"),
             selectedIndex: selectedIndex,
             showType: 0,
-            isOwner: false,
             origin:true
         }
     }
@@ -54,20 +53,15 @@ class App extends Component {
                         localStorage.setItem("PK", accounts[0].pk);
                         localStorage.setItem("MAINPKR", accounts[0].mainPKr);
                         localStorage.setItem("NAME", accounts[0].name);
-                        oAbi.auditor(accounts[0].pk, function (owner) {
-                            self.setState({
-                                pk: accounts[0].pk,
-                                mainPKr: accounts[0].mainPKr,
-                                isOwner: accounts[0].mainPKr == owner
-                            });
+                        self.setState({
+                            pk: accounts[0].pk,
+                            mainPKr: accounts[0].mainPKr,
                         });
                     });
                 } else {
                     let mainPKr = localStorage.getItem("MAINPKR");
                     let name = localStorage.getItem("NAME");
-                    oAbi.auditor(mainPKr, function (owner) {
-                        self.setState({pk: pk, mainPKr: mainPKr, name: name, isOwner: mainPKr == owner});
-                    });
+                    self.setState({pk: pk, mainPKr: mainPKr, name: name});
                 }
             })
     }
@@ -166,9 +160,7 @@ class App extends Component {
 
                 </div>
                 <WhiteSpace/>
-                {
-                    this.state.isOwner && <AuditingList/>
-                }
+                <AuditingList/>
             </WingBlank>
         )
     }

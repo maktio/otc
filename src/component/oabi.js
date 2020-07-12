@@ -215,10 +215,19 @@ class OAbi {
         });
     }
 
+    owner(from, callback) {
+        let self = this;
+        this.callMethod(contract, 'owner', from, [], function (ret) {
+            self.getFullAddress([ret[0]], function (rets) {
+                callback(rets.result[ret[0]])
+            });
+        });
+    }
+
     managers(from, callback) {
         let self = this;
-        this.callMethod(contract, 'managers', from, [], function (ret) {
-            callback(ret)
+        this.callMethod(contract, 'managers', from, [from], function (ret) {
+            callback(ret[0])
         });
     }
 

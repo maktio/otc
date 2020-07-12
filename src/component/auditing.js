@@ -18,8 +18,9 @@ export class AuditingList extends Component {
             orderInfo: null,
             orders: [],
             codes: [],
-            isAuditor:false,
-            isManager:false
+            isOwner:false,
+            isAuditor: false,
+            isManager: false
 
         }
     }
@@ -28,8 +29,11 @@ export class AuditingList extends Component {
         let self = this;
         oAbi.init
             .then(() => {
-                oAbi.auditor(self.state.mainPKr, function (owner) {
-                    self.setState({isAuditor: self.state.mainPKr == owner});
+                oAbi.owner(self.state.mainPKr, function (owner) {
+                    self.setState({isOwner: self.state.mainPKr == owner});
+                });
+                oAbi.auditor(self.state.mainPKr, function (auditor) {
+                    self.setState({isAuditor: self.state.mainPKr == auditor});
                 });
                 oAbi.managers(self.state.mainPKr, function (flag) {
                     self.setState({isManager: flag});
@@ -131,7 +135,7 @@ export class AuditingList extends Component {
                             </span>}
                         />
                         <Card.Body>
-                            <div style={{fontSize:'12px'}}>
+                            <div style={{fontSize: '12px'}}>
                                 <Flex>
                                     <Flex.Item
                                         style={{flex: 1}}>价格({oAbi.unitName(item.unit)})</Flex.Item>
@@ -148,7 +152,8 @@ export class AuditingList extends Component {
                                     <Flex.Item style={{flex: 1}}>{showValue(item.order.value, 18, 4)}</Flex.Item>
 
                                     <Flex.Item style={{flex: 1}}>{item.order.payType}</Flex.Item>
-                                    <Flex.Item style={{flex: 1}}>{formatDate(new Date(item.order.updateTime * 1000))}</Flex.Item>
+                                    <Flex.Item
+                                        style={{flex: 1}}>{formatDate(new Date(item.order.updateTime * 1000))}</Flex.Item>
                                 </Flex>
                             </div>
 
@@ -161,57 +166,68 @@ export class AuditingList extends Component {
             )
         })
 
-        return (
-            <div style={{border: '1px solid #d4d4d5', paddingTop: '10px'}}>
-                <WingBlank>
-                    <div className="ui action input">
-                        <input type="text" placeholder="order id" ref={el => this.orderIdValue = el}
-                               onChange={(event) => {
-                                   this.orderIdValue.value = event.target.value;
-                               }}/>
-                        <button className="ui button" onClick={() => {
-                            oAbi.orderInfo(this.state.mainPKr, this.orderIdValue.value, function (orderInfo) {
-                                self.setState({orderInfo: orderInfo});
-                            })
-                        }}>查看
-                        </button>
-                        <button className="ui button" onClick={() => {
-                            oAbi.arbitrate(this.state.pk, this.state.mainPKr, this.orderIdValue.value);
-                        }}>仲裁
-                        </button>
-                    </div>
+        if (this.state.isAuditor || this.state.isManager) {
+            return (
+                <div style={{border: '1px solid #d4d4d5', paddingTop: '10px'}}>
+                    {
+                        this.state.isManager && <div><WingBlank>
+                            <div className="ui action input">
+                                <input type="text" placeholder="order id" ref={el => this.orderIdValue = el}
+                                       onChange={(event) => {
+                                           this.orderIdValue.value = event.target.value;
+                                       }}/>
+                                <button className="ui button" onClick={() => {
+                                    oAbi.orderInfo(this.state.mainPKr, this.orderIdValue.value, function (orderInfo) {
+                                        self.setState({orderInfo: orderInfo});
+                                    })
+                                }}>查看
+                                </button>
+                                <button className="ui button" onClick={() => {
+                                    oAbi.arbitrate(this.state.pk, this.state.mainPKr, this.orderIdValue.value);
+                                }}>仲裁
+                                </button>
+                            </div>
+                            <WhiteSpace/>
+                            {
+                                this.state.orderInfo && <Flex>
+                                    <Flex.Item
+                                        style={{flex: 1}}>{this.state.orderInfo.orderType == 0 ? "买入" : "卖出"}</Flex.Item>
+                                    <Flex.Item
+                                        style={{flex: 1}}>{showValue(this.state.orderInfo.order.price, 9, 4)} {oAbi.unitName(this.state.orderInfo.unit)}</Flex.Item>
+                                    <Flex.Item
+                                        style={{flex: 1}}>{showValue(this.state.orderInfo.order.value, 18, 4)}</Flex.Item>
+
+                                    <Flex.Item
+                                        style={{flex: 1}}>{this.showStatus(this.state.orderInfo.order.status)}</Flex.Item>
+                                    <Flex.Item style={{flex: 1}}>{this.state.orderInfo.order.payType}</Flex.Item>
+                                    <Flex.Item
+                                        style={{flex: 3}}>{formatDate(new Date(this.state.orderInfo.order.updateTime * 1000))}</Flex.Item>
+                                </Flex>
+                            }
+                        </WingBlank>
+                            <WhiteSpace/>
+                            <WingBlank>
+                                <div className="ui list">
+                                    {ordersHtml}
+                                </div>
+                            </WingBlank>
+                        </div>
+                    }
+
+
                     <WhiteSpace/>
                     {
-
-                        this.state.orderInfo && <Flex>
-                            <Flex.Item
-                                style={{flex: 1}}>{this.state.orderInfo.orderType == 0 ? "买入" : "卖出"}</Flex.Item>
-                            <Flex.Item
-                                style={{flex: 1}}>{showValue(this.state.orderInfo.order.price, 9, 4)} {oAbi.unitName(this.state.orderInfo.unit)}</Flex.Item>
-                            <Flex.Item
-                                style={{flex: 1}}>{showValue(this.state.orderInfo.order.value, 18, 4)}</Flex.Item>
-
-                            <Flex.Item
-                                style={{flex: 1}}>{this.showStatus(this.state.orderInfo.order.status)}</Flex.Item>
-                            <Flex.Item style={{flex: 1}}>{this.state.orderInfo.order.payType}</Flex.Item>
-                            <Flex.Item
-                                style={{flex: 3}}>{formatDate(new Date(this.state.orderInfo.order.updateTime * 1000))}</Flex.Item>
-                        </Flex>
+                        this.state.isAuditor && <WingBlank>
+                            <List renderHeader={() => '审核列表'} className="my-list">
+                                {list}
+                            </List>
+                        </WingBlank>
                     }
-                </WingBlank>
-                <WhiteSpace/>
-                <WingBlank>
-                    <div className="ui list">
-                        {ordersHtml}
-                    </div>
-                </WingBlank>
-                <WhiteSpace/>
-                <WingBlank>
-                    <List renderHeader={() => '审核列表'} className="my-list">
-                        {list}
-                    </List>
-                </WingBlank>
-            </div>
-        )
+                </div>
+            )
+        } else {
+            return ""
+        }
+
     }
 }
