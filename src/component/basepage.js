@@ -5,8 +5,6 @@ import {hash, randomByte32} from "./common";
 import language from './language'
 import * as cookie from "react-cookies";
 
-const host = "http://localhost:3000";
-
 export default class BasePage extends Component {
 
     constructor(props, state) {
@@ -42,7 +40,7 @@ export default class BasePage extends Component {
             [
                 {
                     text: <span>{language.e().modal.cancel}</span>, onPress: () => {
-                        window.location.href = host;
+                        window.location.href = document.location.origin + document.location.pathname;
                     }
                 },
                 {
@@ -56,13 +54,13 @@ export default class BasePage extends Component {
                                 oAbi.auditor(self.state.mainPKr, function (auditor) {
                                     oAbi.pkrEncrypt(auditor, code1, function (pcode) {
                                         oAbi.registerKyc(self.state.pk, self.state.mainPKr, name, code2, ecode, pcode, function (res, error) {
-                                            window.location.href = host;
+                                            window.location.href = document.location.origin + document.location.pathname;
                                         });
                                     });
                                 });
                             } else {
                                 oAbi.registerKyc(self.state.pk, self.state.mainPKr, name, code2, ecode, "0x", function (res, error) {
-                                    window.location.href = host;
+                                    window.location.href = document.location.origin + document.location.pathname;
                                 });
                             }
                         });
@@ -89,12 +87,11 @@ export default class BasePage extends Component {
                         {text: <span>{language.e().modal.cancel}</span>},
                         {
                             text: <span>{language.e().modal.ok}</span>, onPress: () => {
-                                let protocol = document.URL.substring(0, document.URL.indexOf("://"));
                                 var urlenc;
                                 if (auditing) {
-                                    urlenc = encodeURIComponent( document.URL+"/?page=business&code=codeId");
+                                    urlenc = encodeURIComponent(document.URL + "/?page=business&code=codeId");
                                 } else {
-                                    urlenc = encodeURIComponent(document.URL+"/?page=customer&code=codeId");
+                                    urlenc = encodeURIComponent(document.URL + "/?page=customer&code=codeId");
                                 }
                                 window.location.href = "https://ahoj.xyz/profile?lang=cn&force=" + this.state.code + "&ref=" + urlenc;
                             }
@@ -102,7 +99,7 @@ export default class BasePage extends Component {
                     ])
             }
 
-        } else if(auditing) {
+        } else if (auditing) {
             if (this.state.auditedStatus == 0) {
                 Modal.alert(language.e().kyc.title3, language.e().kyc.msg3,
                     [
@@ -135,6 +132,7 @@ export default class BasePage extends Component {
 
     componentDidMount() {
         let url = document.URL;
+        console.log("document.URL", document.URL);
         let code0;
         let index = url.indexOf("code=");
         if (index != -1) {
