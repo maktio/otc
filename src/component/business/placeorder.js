@@ -126,7 +126,7 @@ export class PlaceOrder extends BasePage {
                                     this.setState({unit: 0, showSelect: false});
                                     this.init(this.state.mainPKr, null, 0);
                                     e.stopPropagation();
-                                }}>USD
+                                }}>USDT
                                 </div>
                             </div>
                         </div>

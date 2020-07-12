@@ -17,7 +17,10 @@ export class AuditingList extends Component {
             mainPKr: localStorage.getItem("MAINPKR"),
             orderInfo: null,
             orders: [],
-            codes: []
+            codes: [],
+            isAuditor:false,
+            isManager:false
+
         }
     }
 
@@ -25,6 +28,13 @@ export class AuditingList extends Component {
         let self = this;
         oAbi.init
             .then(() => {
+                oAbi.auditor(self.state.mainPKr, function (owner) {
+                    self.setState({isAuditor: self.state.mainPKr == owner});
+                });
+                oAbi.managers(self.state.mainPKr, function (flag) {
+                    self.setState({isManager: flag});
+                });
+
                 oAbi.auditingList(self.state.mainPKr, function (codes) {
                     self.setState({codes: codes});
                 });

@@ -208,8 +208,17 @@ class OAbi {
     }
 
     getFullAddress(pkrs, callback) {
-        rpc.seroRpc("http://150.158.109.143:8545", "sero_getFullAddress", [pkrs], function (rets) {
-            callback(rets);
+        seropp.getInfo(function (info) {
+            rpc.seroRpc(info.rpc, "sero_getFullAddress", [pkrs], function (rets) {
+                callback(rets);
+            });
+        });
+    }
+
+    managers(from, callback) {
+        let self = this;
+        this.callMethod(contract, 'managers', from, [], function (ret) {
+            callback(ret)
         });
     }
 
