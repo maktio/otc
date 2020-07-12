@@ -244,6 +244,7 @@ class OAbi {
 
     orderInfo(from, id, callback) {
         this.callMethod(contract, 'orderInfo', from, [this.bigToHex(id)], function (ret) {
+            console.log("orderInfo",ret[0]);
             callback(ret[0]);
         });
     }

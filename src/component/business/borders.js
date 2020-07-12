@@ -89,7 +89,7 @@ export class BOrders extends Component {
             }
 
             return (
-                <div className="item">
+                <div className="item" key={index}>
                     <Card>
                         <Card.Header
                             title={

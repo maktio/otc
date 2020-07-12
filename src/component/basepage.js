@@ -92,9 +92,9 @@ export default class BasePage extends Component {
                                 let protocol = document.URL.substring(0, document.URL.indexOf("://"));
                                 var urlenc;
                                 if (auditing) {
-                                    urlenc = encodeURIComponent(protocol + "://localhost:3000/?page=business&code=codeId");
+                                    urlenc = encodeURIComponent( document.URL+"/?page=business&code=codeId");
                                 } else {
-                                    urlenc = encodeURIComponent(protocol + "://localhost:3000/?page=customer&code=codeId");
+                                    urlenc = encodeURIComponent(document.URL+"/?page=customer&code=codeId");
                                 }
                                 window.location.href = "https://ahoj.xyz/profile?lang=cn&force=" + this.state.code + "&ref=" + urlenc;
                             }

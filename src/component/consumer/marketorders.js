@@ -129,7 +129,7 @@ export class MarketOrders extends BasePage {
                             title={item.name}
                             extra={
                                 <div className="ui breadcrumb">
-                                    <div className="section">成交:{item.deals}</div>
+                                    <div className="section">仲裁:{item.arbitration} 成交:{item.deals}</div>
                                     <div className="divider"></div>
                                     <div className="active section">
                                         <a onClick={() => {
