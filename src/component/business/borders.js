@@ -81,7 +81,7 @@ export class BOrders extends Component {
         let self = this;
         let orders = this.state.orders.map((item, index) => {
             // let num = 0;
-            let canCancel = item.underwayCount == 0;
+            let canCancel = item.order.status == 0 && item.underwayCount == 0;
             let underway = item.order.status == 0 && new BigNumber(item.order.value).comparedTo(new BigNumber(item.order.dealtValue)) > 0;
             let status = "进行中";
             if (!underway) {

@@ -23,7 +23,6 @@ contract SeroInterface {
         return strings._bytes32ToStr(b32);
     }
 
-
     function sero_send_token(address _receiver, string memory _currency, uint256 _amount) internal returns (bool success){
         return sero_send(_receiver, _currency, _amount, "", 0);
     }
@@ -84,7 +83,6 @@ contract Role {
         emit OwnershipTransferred(owner, newOwner);
         owner = newOwner;
     }
-
 }
 
 contract OTC is SeroInterface, Role {
@@ -116,15 +114,18 @@ contract OTC is SeroInterface, Role {
 
     mapping(bytes32 => Kyc) private kycs; //hcode => Kyc
     mapping(address => bytes32) private kycsMap; //address => hcode
+
     mapping(address => bytes32) ecodesMap;
     mapping(bytes32 => bool) private hasAuditedMap;
     mapping(bytes32 => bytes) private codesMap;
     Array.List private needAuditingList;
 
-    mapping(uint256 => bytes[]) private ordersKyc;//orderId => uesr_ecode,business_ecode
-
     mapping(bytes32 => bool) private tokenMap;
     Array.List private arbitrateList;
+
+    uint256 chargeRate = 10;
+
+    event OrderLog(bytes32 token, uint256 value, uint256 price, uint8 unit, uint8 orderType, uint64 timeStamp);
 
     constructor(address _auditor) public {
         auditor = _auditor;
@@ -168,19 +169,17 @@ contract OTC is SeroInterface, Role {
     }
 
     function userOrderList() public view returns (Types.RetUserOrder[] memory rets) {
-        (uint256[] memory ids, Types.UserOrder[] memory orders) = orderPlatform.userOrderList(msg.sender);
+        rets = orderPlatform.userOrderList(msg.sender);
 
-        rets = new Types.RetUserOrder[](ids.length);
-        for (uint256 i = 0; i < ids.length; i++) {
-            Types.UserOrder memory userOrder = orders[i];
-            Types.BusinessOrder memory businessOrder = orderPlatform.businessOrdersMap[userOrder.businessOrderId];
-            Kyc memory kyc = kycs[kycsMap[userOrder.owner]];
+        for (uint256 i = 0; i < rets.length; i++) {
 
-            rets[i] = Types.RetUserOrder({id : ids[i], order : userOrder, name : kyc.name,
-                arbitration : kyc.userRoleArbitrates, hcode : kycsMap[businessOrder.owner],
-                mcode : ordersKyc[ids[i]].length == 2 ? ordersKyc[ids[i]][1] : new bytes(0),
-                unit : businessOrder.unit
-                });
+            Types.BusinessOrder memory businessOrder = orderPlatform.businessOrdersMap[rets[i].order.businessOrderId];
+            Kyc memory kyc = kycs[kycsMap[businessOrder.owner]];
+
+            rets[i].name = kyc.name;
+            rets[i].arbitration = kyc.businessRoleArbitrates;
+            rets[i].hcode = kycsMap[businessOrder.owner];
+            rets[i].unit = businessOrder.unit;
         }
     }
 
@@ -190,21 +189,16 @@ contract OTC is SeroInterface, Role {
             return new Types.RetUserOrder[](0);
         }
 
-        (uint256[] memory ids, Types.UserOrder[] memory orders) = orderPlatform.userOrderListByBId(bid);
+        rets = orderPlatform.userOrderListByBId(bid);
 
-        rets = new Types.RetUserOrder[](ids.length);
-        for (uint256 i = 0; i < ids.length; i++) {
-            Types.UserOrder memory userOrder = orders[i];
+        for (uint256 i = 0; i < rets.length; i++) {
+            Types.UserOrder memory userOrder = rets[i].order;
             Kyc memory kyc = kycs[kycsMap[userOrder.owner]];
 
-            if (userOrder.value != 0) {
-                rets[i] = Types.RetUserOrder({id : ids[i], order : userOrder, name : kyc.name,
-                    arbitration : kyc.userRoleArbitrates, hcode : kycsMap[userOrder.owner],
-                    mcode : ordersKyc[ids[i]][0], unit : businessOrder.unit});
-            } else {
-                rets[i] = Types.RetUserOrder({id : 0, order : userOrder, name : "",
-                    arbitration : 0, hcode : bytes32(0), mcode : new bytes(0), unit : 0});
-            }
+            rets[i].name = kyc.name;
+            rets[i].arbitration = kyc.userRoleArbitrates;
+            rets[i].hcode = kycsMap[userOrder.owner];
+            rets[i].unit = businessOrder.unit;
         }
     }
 
@@ -224,33 +218,18 @@ contract OTC is SeroInterface, Role {
             Types.BusinessOrder memory order = orders[i];
             Kyc memory kyc = kycs[kycsMap[order.owner]];
 
-            uint256 underwayCount;
-            if (myself) {
-                (,Types.UserOrder[] memory uOrders) = orderPlatform.userOrderListByBId(ids[i]);
-                for (uint256 j = 0; j < uOrders.length; j++) {
-                    if (uOrders[j].status == Types.OrderStatus.waitConfirmed ||
-                    uOrders[j].status == Types.OrderStatus.confirmed ||
-                    uOrders[j].status == Types.OrderStatus.arbitrate) {
-                        underwayCount++;
-                    }
-                }
-            }
-
             rets[i] = Types.RetBusinessOrder({id : ids[i], order : orders[i],
                 name : kyc.name,
                 hcode : kycsMap[order.owner],
                 deals : kyc.deals,
-                underwayCount : underwayCount,
+                underwayCount : orderPlatform.relationsMap[ids[i]].count,
                 arbitration : kyc.businessRoleArbitrates, labels : kyc.labels});
         }
     }
 
-    function addToken(string memory token, uint8 unit) public onlyOwner {
+    function setToken(string memory token, uint8 unit, bool flag) public onlyOwner {
         bytes32 key = keccak256(abi.encodePacked(token, unit));
-        if (tokenMap[key]) {
-            return;
-        }
-        tokenMap[key] = true;
+        tokenMap[key] = flag;
     }
 
     function audited(bytes32[] memory hcodes, bool status) public onlyAuditor {
@@ -267,10 +246,9 @@ contract OTC is SeroInterface, Role {
         hasAuditedMap[hcode] = false;
     }
 
-    function addLable(bytes32 hcode, uint8 label) public onlyAuditor {
+    function addLabel(bytes32 hcode, uint8 label) public onlyAuditor {
         kycs[hcode].labels.push(label);
     }
-
 
     function needAuditing(bytes memory pcode) public {
         bytes32 hcode = kycsMap[msg.sender];
@@ -300,14 +278,12 @@ contract OTC is SeroInterface, Role {
         }
     }
 
-
     function arbitrate(uint256 userOrderId) public onlyArbitrater {
         Types.UserOrder storage userOrder = orderPlatform.userOrdersMap[userOrderId];
         require(userOrder.status == Types.OrderStatus.confirmed);
         userOrder.status = Types.OrderStatus.arbitrate;
         arbitrateList.push(bytes32(userOrderId));
     }
-
 
     function executeArbitrate(uint256 userOrderId, uint8 winRole) public onlyArbitrater {
         Types.UserOrder memory userOrder = orderPlatform.userOrdersMap[userOrderId];
@@ -317,7 +293,7 @@ contract OTC is SeroInterface, Role {
         if (winRole == 1) {
             if (userOrder.orderType == Types.OrderType.sell) {
                 business = orderPlatform.arbitrate(userOrderId, Types.OrderStatus.finished);
-                require(sero_send_token(business, strings._bytes32ToStr(userOrder.token), userOrder.value));
+                sendToken(business, strings._bytes32ToStr(userOrder.token), userOrder.value);
             } else {
                 orderPlatform.arbitrate(userOrderId, Types.OrderStatus.refused);
             }
@@ -328,7 +304,7 @@ contract OTC is SeroInterface, Role {
             } else {
                 business = orderPlatform.arbitrate(userOrderId, Types.OrderStatus.finished);
             }
-            require(sero_send_token(userOrder.owner, strings._bytes32ToStr(userOrder.token), userOrder.value));
+            sendToken(userOrder.owner, strings._bytes32ToStr(userOrder.token), userOrder.value);
             kycs[kycsMap[business]].businessRoleArbitrates++;
         }
         arbitrateList.delVal(bytes32(userOrderId));
@@ -341,9 +317,9 @@ contract OTC is SeroInterface, Role {
         require(order.status == Types.OrderStatus.underway);
         require(order.orderType == Types.OrderType.sell);
         require(order.minDealValue <= value && value <= order.maxDealValue);
-        require(order.value - order.dealtValue - order.lockinValue >= value);
+        require(order.value.sub(order.dealtValue).sub(order.lockinValue) >= value);
 
-        (uint256 id, uint256[] memory ids) = orderPlatform.insertUserOrder(Types.UserOrder({
+        orderPlatform.insertUserOrder(Types.UserOrder({
             owner : msg.sender,
             businessOrderId : orderId,
             value : value,
@@ -354,12 +330,7 @@ contract OTC is SeroInterface, Role {
             payType : payType,
             status : Types.OrderStatus.waitConfirmed,
             orderType : Types.OrderType.buy
-            }));
-
-        ordersKyc[id].push(mcode);
-        for (uint256 i = 0; i < ids.length; i++) {
-            delete ordersKyc[ids[i]];
-        }
+            }), mcode);
     }
 
     function exchangeSell(bytes memory mcode, uint256 orderId, uint8 payType) public payable {
@@ -374,9 +345,9 @@ contract OTC is SeroInterface, Role {
         require(order.status == Types.OrderStatus.underway);
         require(order.orderType == Types.OrderType.buy);
         require(order.minDealValue <= value && value <= order.maxDealValue);
-        require(order.value - order.dealtValue - order.lockinValue >= value);
+        require(order.value.sub(order.dealtValue).sub(order.lockinValue) >= value);
 
-        (uint256 id, uint256[] memory ids) = orderPlatform.insertUserOrder(Types.UserOrder({
+        orderPlatform.insertUserOrder(Types.UserOrder({
             owner : msg.sender,
             businessOrderId : orderId,
             value : value,
@@ -386,12 +357,7 @@ contract OTC is SeroInterface, Role {
             updateTime : now,
             payType : payType,
             status : Types.OrderStatus.waitConfirmed,
-            orderType : Types.OrderType.sell}));
-
-        ordersKyc[id].push(mcode);
-        for (uint256 i = 0; i < ids.length; i++) {
-            delete ordersKyc[ids[i]];
-        }
+            orderType : Types.OrderType.sell}), mcode);
     }
 
     function refused(uint256 userOrderId) public {
@@ -410,12 +376,13 @@ contract OTC is SeroInterface, Role {
 
     function confirmed(uint256 userOrderId, bytes memory mcode) public {
         orderPlatform.checkBOPOrder(msg.sender, userOrderId, Types.OrderStatus.waitConfirmed);
-        orderPlatform.confirmed(userOrderId);
-        ordersKyc[userOrderId].push(mcode);
+        orderPlatform.confirmed(userOrderId, mcode);
     }
 
     function finished(uint256 userOrderId) public {
         Types.UserOrder memory userOrder = orderPlatform.userOrdersMap[userOrderId];
+        Types.BusinessOrder memory businessOrder = orderPlatform.businessOrdersMap[userOrder.businessOrderId];
+
         if (userOrder.orderType == Types.OrderType.buy) {
             orderPlatform.checkBOPOrder(msg.sender, userOrderId, Types.OrderStatus.confirmed);
         } else {
@@ -425,11 +392,24 @@ contract OTC is SeroInterface, Role {
         }
 
         address to = orderPlatform.finished(userOrderId);
-        require(sero_send_token(to, strings._bytes32ToStr(userOrder.token), userOrder.value));
+        sendToken(to, strings._bytes32ToStr(userOrder.token), userOrder.value);
 
-        kycs[kycsMap[msg.sender]].deals++;
+        kycs[kycsMap[businessOrder.owner]].deals++;
+        kycs[kycsMap[userOrder.owner]].deals++;
+
+        emit  OrderLog(userOrder.token, userOrder.value, userOrder.price, businessOrder.unit, uint8(userOrder.status), uint64(now));
     }
 
+
+    function sendToken(address to, string memory tokenName, uint256 value) internal {
+        if (chargeRate > 0) {
+            uint256 fee = value.mul(chargeRate) / 10000;
+            require(sero_send_token(owner, tokenName, fee));
+            require(sero_send_token(to, tokenName, value.sub(fee)));
+        } else {
+            require(sero_send_token(to, tokenName, value));
+        }
+    }
 
     function userCancel(uint256 userOrderId) public {
         Types.UserOrder storage userOrder = orderPlatform.userOrdersMap[userOrderId];
@@ -449,17 +429,7 @@ contract OTC is SeroInterface, Role {
         Types.BusinessOrder storage order = orderPlatform.businessOrdersMap[orderId];
         require(order.status == Types.OrderStatus.underway);
         require(order.owner == msg.sender);
-
-        bool flag;
-        for (uint256 i = 0; i < orderPlatform.relationList[orderId].length; i++) {
-            Types.UserOrder memory userOrder = orderPlatform.userOrdersMap[orderPlatform.relationList[orderId][i]];
-            if (userOrder.status == Types.OrderStatus.underway ||
-            userOrder.status == Types.OrderStatus.confirmed) {
-                flag = true;
-                break;
-            }
-        }
-        require(!flag);
+        require(orderPlatform.relationsMap[orderId].count == 0);
 
         order.status = Types.OrderStatus.canceled;
         if (order.orderType == Types.OrderType.sell) {
@@ -468,10 +438,11 @@ contract OTC is SeroInterface, Role {
     }
 
     function updatePrice(uint256 orderId, uint256 price) public {
-        Types.BusinessOrder storage order = orderPlatform.businessOrdersMap[orderId];
-        require(order.status == Types.OrderStatus.underway);
-        require(order.owner == msg.sender);
-        order.price = price;
+        orderPlatform.updatePrice(orderId, price);
+//        Types.BusinessOrder storage order = orderPlatform.businessOrdersMap[orderId];
+//        require(order.status == Types.OrderStatus.underway);
+//        require(order.owner == msg.sender);
+//        order.price = price;
     }
 
     function businessBuy(string memory tokenName, uint256 value, uint256 minDealValue, uint256 maxDealVlaue, uint256 price, uint8 unit, string memory information) public {
@@ -492,7 +463,7 @@ contract OTC is SeroInterface, Role {
             maxDealValue : maxDealVlaue,
             price : price,
             unit : unit,
-            timestemp : now,
+            createTime : now,
             status : Types.OrderStatus.underway,
             orderType : Types.OrderType.buy,
             information : information
@@ -518,7 +489,7 @@ contract OTC is SeroInterface, Role {
             maxDealValue : maxDealVlaue,
             price : price,
             unit : unit,
-            timestemp : now,
+            createTime : now,
             status : Types.OrderStatus.underway,
             orderType : Types.OrderType.sell,
             information : information

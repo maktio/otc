@@ -89,11 +89,12 @@ export default class BasePage extends Component {
                         {text: <span>{language.e().modal.cancel}</span>},
                         {
                             text: <span>{language.e().modal.ok}</span>, onPress: () => {
+                                let protocol = document.URL.substring(0, document.URL.indexOf("://"));
                                 var urlenc;
                                 if (auditing) {
-                                    urlenc = encodeURIComponent("https://localhost:3000/?page=business&code=codeId");
+                                    urlenc = encodeURIComponent(protocol + "://localhost:3000/?page=business&code=codeId");
                                 } else {
-                                    urlenc = encodeURIComponent("https://localhost:3000/?page=customer&code=codeId");
+                                    urlenc = encodeURIComponent(protocol + "://localhost:3000/?page=customer&code=codeId");
                                 }
                                 window.location.href = "https://ahoj.xyz/profile?lang=cn&force=" + this.state.code + "&ref=" + urlenc;
                             }
@@ -101,7 +102,7 @@ export default class BasePage extends Component {
                     ])
             }
 
-        } else {
+        } else if(auditing) {
             if (this.state.auditedStatus == 0) {
                 Modal.alert(language.e().kyc.title3, language.e().kyc.msg3,
                     [

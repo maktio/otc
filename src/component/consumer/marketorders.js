@@ -180,7 +180,7 @@ export class MarketOrders extends BasePage {
                         } extra={
                             <Button type="ghost" inline size="small" style={{marginRight: '4px'}}
                                     onClick={() => {
-                                        if (this.state.auditedStatus == 0) {
+                                        if (!this.state.code) {
                                             this.kyc(false);
                                         } else {
                                             oAbi.getPayTypes(item.hcode, function (list) {
