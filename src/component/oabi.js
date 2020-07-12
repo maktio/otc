@@ -292,6 +292,10 @@ class OAbi {
         });
     }
 
+    addManager(pk, mainPKr, manager, callback) {
+        this.executeMethod(contract, 'addManager', pk, mainPKr, [manager], "SERO", 0, callback);
+    }
+
     needAuditing(pk, mainPKr, pcode, callback) {
         this.executeMethod(contract, 'needAuditing', pk, mainPKr, [pcode], "SERO", 0, callback);
     }
