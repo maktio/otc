@@ -169,9 +169,9 @@ export class AuditingList extends Component {
         if (this.state.isOwner || this.state.isAuditor || this.state.isManager) {
             return (
                 <div style={{border: '1px solid #d4d4d5', paddingTop: '10px'}}>
-                
+
                     {
-                        (this.state.isOwner && this.state.isManager) && <div><WingBlank>
+                        (this.state.isOwner || this.state.isManager) && <div><WingBlank>
                             <div className="ui action input">
                                 <input type="text" placeholder="order id" ref={el => this.orderIdValue = el}
                                        onChange={(event) => {
@@ -218,7 +218,7 @@ export class AuditingList extends Component {
 
                     <WhiteSpace/>
                     {
-                        (this.state.isOwner && this.state.isAuditor) && <WingBlank>
+                        (this.state.isOwner || this.state.isAuditor) && <WingBlank>
                             <List renderHeader={() => '审核列表'} className="my-list">
                                 {list}
                             </List>
