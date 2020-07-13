@@ -253,6 +253,11 @@ export class MarketOrders extends BasePage {
                                             return;
                                         }
 
+                                        if (amount < this.state.minValue) {
+                                            Toast.fail("低于最小交易额!");
+                                            return;
+                                        }
+
                                         if (amount > this.state.maxValue) {
                                             Toast.fail("超出可交易范围!");
                                             return;
