@@ -253,11 +253,6 @@ export class MarketOrders extends BasePage {
                                             return;
                                         }
 
-                                        if (amount < 10e18) {
-                                            Toast.fail("输入金额为0");
-                                            return;
-                                        }
-
                                         if (amount > this.state.maxValue) {
                                             Toast.fail("超出可交易范围!");
                                             return;
