@@ -2,10 +2,9 @@ import React, {Component} from 'react';
 import {Button, Card, Flex, List, Modal, WhiteSpace, WingBlank} from "antd-mobile";
 import 'semantic-ui-css/semantic.min.css';
 import oAbi from './oabi'
-import {hash, showValue, formatDate, bytes32ToToken} from "./common";
+import {showValue, formatDate, bytes32ToToken} from "./common";
 import Iframe from "react-iframe";
 import language from "./language";
-import BigNumber from "bignumber.js";
 
 export class AuditingList extends Component {
 
@@ -13,14 +12,19 @@ export class AuditingList extends Component {
         super(props);
 
         this.state = {
-            pk: localStorage.getItem("PK"),
-            mainPKr: localStorage.getItem("MAINPKR"),
             orderInfo: null,
             orders: [],
             codes: [],
-            isOwner: false,
-            isAuditor: false,
-            isManager: false
+
+        }
+    }
+
+    componentWillReceiveProps(nextProps) {
+        let self = this;
+        if (nextProps.pk != this.props.pk) {
+            oAbi.accountDetails(nextProps.pk, function (account) {
+                self.setState({pk: nextProps.pk, mainPKr: account.mainPKr});
+            });
         }
     }
 
@@ -28,21 +32,15 @@ export class AuditingList extends Component {
         let self = this;
         oAbi.init
             .then(() => {
-                oAbi.owner(self.state.mainPKr, function (owner) {
-                    self.setState({isOwner: self.state.mainPKr == owner});
-                });
-                oAbi.auditor(self.state.mainPKr, function (auditor) {
-                    self.setState({isAuditor: self.state.mainPKr == auditor});
-                });
-                oAbi.managers(self.state.mainPKr, function (flag) {
-                    self.setState({isManager: flag});
-                });
+                oAbi.accountDetails(self.props.pk, function (account) {
+                    self.setState({pk: account.pk, mainPKr: account.mainPKr});
 
-                oAbi.auditingList(self.state.mainPKr, function (codes) {
-                    self.setState({codes: codes});
-                });
-                oAbi.arbitrateOrders(self.state.mainPKr, function (orders) {
-                    self.setState({orders: orders});
+                    oAbi.auditingList(self.state.mainPKr, function (codes) {
+                        self.setState({codes: codes});
+                    });
+                    oAbi.arbitrateOrders(self.state.mainPKr, function (orders) {
+                        self.setState({orders: orders});
+                    });
                 });
             });
     }
@@ -66,6 +64,8 @@ export class AuditingList extends Component {
     }
 
     render() {
+        let roleType = this.props.roleType
+
         let self = this;
         let list = this.state.codes.map((item, index) => {
 
@@ -165,26 +165,38 @@ export class AuditingList extends Component {
             )
         })
 
-        if (this.state.isOwner || this.state.isAuditor || this.state.isManager) {
+        if (roleType > 0) {
             return (
                 <div style={{border: '1px solid #d4d4d5', paddingTop: '10px'}}>
 
                     {
-                        this.state.isOwner && <div className="ui action input">
+                        roleType == 1 && <div className="ui action">
+                            <WingBlank>
+                            <textarea rows="6" cols="42" ref={el => this.auditorValue = el} onChange={(event) => {
+                                this.auditorValue.value = event.target.value.trim();
+                            }}></textarea>
+                                <div className="ui submit button" onClick={() => {
+                                    oAbi.setAuditor(this.state.pk, this.state.mainPKr, this.auditorValue.value);
+                                }}>设置审核员
+                                </div>
+                            </WingBlank>
+                            <WhiteSpace/>
+
                             <WingBlank>
                             <textarea rows="6" cols="42" ref={el => this.managerValue = el} onChange={(event) => {
                                 this.managerValue.value = event.target.value.trim();
                             }}></textarea>
                                 <div className="ui submit button" onClick={() => {
-                                    oAbi.addManager(this.state.pk, this.state.mainPKr, this.managerValue.value);
+                                    oAbi.setManager(this.state.pk, this.state.mainPKr, this.managerValue.value, true);
                                 }}>添加管理员
                                 </div>
                             </WingBlank>
+                            <WhiteSpace/>
                         </div>
                     }
-                    <WhiteSpace/>
+
                     {
-                        (this.state.isOwner || this.state.isManager) && <div><WingBlank>
+                        (roleType == 1 || roleType == 3) && <div><WingBlank>
                             <div className="ui action input">
                                 <input type="text" placeholder="order id" ref={el => this.orderIdValue = el}
                                        onChange={(event) => {
@@ -225,13 +237,14 @@ export class AuditingList extends Component {
                                     {ordersHtml}
                                 </div>
                             </WingBlank>
+                            <WhiteSpace/>
                         </div>
                     }
 
 
-                    <WhiteSpace/>
                     {
-                        (this.state.isOwner || this.state.isAuditor) && <WingBlank>
+                        (roleType == 1 || roleType == 2) && <WingBlank>
+
                             <List renderHeader={() => '审核列表'} className="my-list">
                                 {list}
                             </List>

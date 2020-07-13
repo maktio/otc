@@ -49,19 +49,21 @@ class App extends Component {
             .then(() => {
                 let pk = localStorage.getItem("PK");
                 if (!pk) {
+
                     oAbi.accountList(function (accounts) {
                         localStorage.setItem("PK", accounts[0].pk);
                         localStorage.setItem("MAINPKR", accounts[0].mainPKr);
                         localStorage.setItem("NAME", accounts[0].name);
-                        self.setState({
-                            pk: accounts[0].pk,
-                            mainPKr: accounts[0].mainPKr,
+                        oAbi.roleType(accounts[0].pk, function (roleType) {
+                            self.setState({pk: accounts[0].pk, mainPKr: accounts[0].pk, name:  accounts[0].name, roleType: roleType});
                         });
                     });
                 } else {
                     let mainPKr = localStorage.getItem("MAINPKR");
                     let name = localStorage.getItem("NAME");
-                    self.setState({pk: pk, mainPKr: mainPKr, name: name});
+                    oAbi.roleType(mainPKr, function (roleType) {
+                        self.setState({pk: pk, mainPKr: mainPKr, name: name, roleType: roleType});
+                    });
                 }
             })
     }
@@ -76,8 +78,8 @@ class App extends Component {
                         actions.push(
                             {
                                 text: <span>{account.name + ":" + showPK(account.pk)}</span>, onPress: () => {
-                                    oAbi.auditor(account.mainPKr, function (owner) {
-                                        self.setState({isOwner: account.mainPKr == owner});
+                                    oAbi.roleType(account.mainPKr, function (roleType) {
+                                        self.setState({roleType: roleType});
                                     });
                                     self.setState({
                                         pk: account.pk,
@@ -160,7 +162,10 @@ class App extends Component {
 
                 </div>
                 <WhiteSpace/>
-                <AuditingList/>
+                {
+                    this.state.roleType > 0 && <AuditingList roleType={this.state.roleType} pk={this.state.pk}/>
+                }
+
             </WingBlank>
         )
     }

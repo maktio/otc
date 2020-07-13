@@ -119,7 +119,7 @@ export class UserOrders extends Component {
                                     }
                                 ])
                             }}
-                            >取消</a></span>
+                            >超时取消</a></span>
                     } else {
                         html = <span>{language.e().order.tips2_1}{value} {oAbi.unitName(child.unit)},<a onClick={() => {
 
