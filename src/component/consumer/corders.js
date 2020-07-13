@@ -25,7 +25,7 @@ export class COrders extends Component {
                         self.init(account.mainPKr);
                         self.timer = setInterval(function () {
                             self.init();
-                        }, 10 * 1000);
+                        }, 5 * 1000);
                     });
                 });
             });

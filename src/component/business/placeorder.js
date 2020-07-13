@@ -22,7 +22,7 @@ export class PlaceOrder extends BasePage {
         if(!self.timer) {
             self.timer = setInterval(function () {
                 self.init();
-            }, 20 * 1000);
+            }, 5 * 1000);
         }
     }
 
