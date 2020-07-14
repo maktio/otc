@@ -159,9 +159,8 @@ export class MarketOrders extends BasePage {
                                         oAbi.getPayTypes(item.hcode, function (list) {
                                             list.forEach((item) => {
                                                 payMethods.push(<Flex key={item.index}>
-                                                    <Flex.Item>{item.type}</Flex.Item>
-                                                    <Flex.Item>{item.account}</Flex.Item>
-                                                    <Flex.Item>{item.channel}</Flex.Item>
+                                                    <Flex.Item style={{flex:1}}>{item.type}</Flex.Item>
+                                                    <Flex.Item style={{flex:2}}>{item.channel}</Flex.Item>
                                                 </Flex>)
                                             });
                                             Modal.alert("", payMethods);
