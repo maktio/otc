@@ -162,7 +162,7 @@ export class MarketOrders extends Kyc {
                                 <Flex.Item style={{textAlign: 'right'}}>
                                     <a onClick={() => {
                                         let payMethods = []
-                                        oAbi.getPayTypes(item.hcode, function (list) {
+                                        oAbi.getPayTypes(item.hcode, oAbi.unitName(self.state.unit), function (list) {
                                             list.forEach((item) => {
                                                 payMethods.push(<Flex key={item.index}>
                                                     <Flex.Item style={{flex: 1}}>{item.type}</Flex.Item>
@@ -188,7 +188,7 @@ export class MarketOrders extends Kyc {
                                         if (!this.state.code) {
                                             this.kyc(false);
                                         } else {
-                                            oAbi.getPayTypes(item.hcode, function (list) {
+                                            oAbi.getPayTypes(item.hcode, oAbi.unitName(self.state.unit),function (list) {
                                                 if (orderType == 0) {
                                                     oAbi.chargeRate(self.state.mainPKr, function (chargeRate) {
                                                         self.setState({
@@ -197,7 +197,7 @@ export class MarketOrders extends Kyc {
                                                             maxValue: item.order.value - item.order.dealtValue,
                                                             price: item.order.price,
                                                             chargeRate: chargeRate,
-                                                            amount:0
+                                                            amount: 0
                                                         });
                                                     });
                                                 } else {
@@ -242,7 +242,7 @@ export class MarketOrders extends Kyc {
                                 <Flex.Item
                                     style={{flex: 1}}><span>单价:{showValue(this.state.price, 9, 4)}{oAbi.unitName(this.state.unit)}</span></Flex.Item>
                                 {
-                                    orderType == 0 && <Flex.Item style={{flex: 2, textAlign:'right'}}>
+                                    orderType == 0 && <Flex.Item style={{flex: 2, textAlign: 'right'}}>
                                         <span>手续费:{this.state.chargeRate / 10000}%, 实收:{this.state.amount}</span>
                                     </Flex.Item>
                                 }

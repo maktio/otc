@@ -42,7 +42,7 @@ contract SeroInterface {
 
 contract Role {
     address public owner;
-    address private auditor;
+    address public auditor;
 
     mapping(address => bool) public managers;
 
@@ -124,12 +124,13 @@ contract OTC is SeroInterface, Role {
     mapping(bytes32 => bool)  private tokenMap;
     Array.List private arbitrateList;
 
-    uint256 private chargeRate = 10;
+    uint256 public chargeRate = 10;
 
     event OrderLog(bytes32 token, uint256 value, uint256 price, uint8 unit, uint8 orderType);
 
     constructor() public {
     }
+
 
     function orderInfo(uint256 id) external view returns(Types.RetUserOrder memory ret) {
         ret.id= id;
@@ -234,6 +235,10 @@ contract OTC is SeroInterface, Role {
     function setToken(string memory token, uint8 unit, bool flag) external onlyOwner {
         bytes32 key = keccak256(abi.encodePacked(token, unit));
         tokenMap[key] = flag;
+    }
+
+    function setChargeRate(uint256 _chargeRate) external onlyOwner {
+        chargeRate = _chargeRate;
     }
 
     function audited(bytes32[] memory hcodes, bool status) external onlyAuditor {

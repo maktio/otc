@@ -120,7 +120,9 @@ class App extends Kyc {
                     mode="light"
                     leftContent={[
                         <span style={{fontSize:'12px'}} onClick={() => {
-                            this.kyc(this.state.selectedIndex == 1);
+                            if (this.state.auditedStatus < 1) {
+                                this.kyc(this.state.selectedIndex == 1);
+                            }
                         }}>{kycStatus}</span>
                     ]}
                     rightContent={[

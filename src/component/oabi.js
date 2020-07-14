@@ -104,7 +104,7 @@ class OAbi {
         seropp.pkrDecrypt({pk: pk, data: data}, callback)
     }
 
-    getPayTypes(code2, callback) {
+    getPayTypes(code2, type, callback) {
         let param = {name: "profile.getByCode2", data: {code2: code2}};
         rpc.post("https://api.ahoj.xyz/api", JSON.stringify(param), 3000, function (ret, err) {
             if (err) {
@@ -112,7 +112,7 @@ class OAbi {
             } else if (ret.state == "succ") {
                 let list = [];
                 ret.data.pcMethods.forEach((item, index) => {
-                    if (!item.disabled) {
+                    if (!item.disable && type == item.type) {
                         list.push({type: item.type, channel: item.channel, account: item.account, index: index});
                     }
                 });
