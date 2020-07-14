@@ -24,17 +24,17 @@ export default class BasePage extends Component {
         }
         this.modal = Modal.alert(language.e().kyc.title2,
             <div>
-                <div className="ui input"><input type="text" placeholder="name"
+                <div className="ui input"><input type="text" placeholder="nickname"
                                                  onChange={(event) => {
                                                      self.nameValue.value = event.target.value.trim();
                                                  }}
                                                  ref={el => self.nameValue = el}/></div>
                 <WhiteSpace/>
-                <div className="ui input"><input type="text" value={code}
-                                                 onChange={(event) => {
-                                                     self.codeValue.value = event.target.value;
-                                                 }}
-                                                 ref={el => self.codeValue = el}/></div>
+                {/*<div className="ui input"><input type="text" value={code}*/}
+                {/*                                 onChange={(event) => {*/}
+                {/*                                     self.codeValue.value = event.target.value;*/}
+                {/*                                 }}*/}
+                {/*                                 ref={el => self.codeValue = el}/></div>*/}
                 <WhiteSpace/>
             </div>,
             [
@@ -47,6 +47,10 @@ export default class BasePage extends Component {
                     text: <span>{language.e().modal.ok}</span>, onPress: () => {
                         self.modal = null;
                         let name = self.nameValue.value;
+                        if(name.length < 3 || name.length > 32) {
+                            Modal.alert('', 'nickname长度3~32个字符',);
+                            return;
+                        }
                         let code1 = oAbi.code1(code);
                         let code2 = oAbi.code2(code1);
                         oAbi.pkrCrypto(self.state.pk, self.state.mainPKr, code, function (ecode, err) {
