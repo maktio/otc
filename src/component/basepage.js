@@ -56,6 +56,10 @@ export default class BasePage extends Component {
                             }
                             if (auditing) {
                                 oAbi.auditor(self.state.mainPKr, function (auditor) {
+                                    if(!auditor) {
+                                        Modal.alert('', '未设置审核员，请联系客服',);
+                                        return;
+                                    }
                                     oAbi.pkrEncrypt(auditor, code1, function (pcode, err) {
                                         if (err) {
                                             Modal.alert('', '不支持老账户',);

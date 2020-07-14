@@ -277,9 +277,13 @@ class OAbi {
     auditor(from, callback) {
         let self = this;
         this.callMethod(contract, 'auditor', from, [], function (ret) {
-            self.getFullAddress([ret[0]], function (rets) {
-                callback(rets.result[ret[0]])
-            });
+            if (ret[0] === "0x0000000000000000000000000000000000000000000000000000000000000000") {
+                callback(null);
+            } else {
+                self.getFullAddress([ret[0]], function (rets) {
+                    callback(rets.result[ret[0]])
+                });
+            }
         });
     }
 
