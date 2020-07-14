@@ -5,16 +5,23 @@ import {hash, randomByte32, urlParse} from "./common";
 import language from './language'
 import * as cookie from "react-cookies";
 
-export default class BasePage extends Component {
+export default class Kyc extends Component {
 
     constructor(props, state) {
         super(props);
-        this.state = Object.assign(state, {
+
+        let selectedIndex = 0;
+        if (document.URL.indexOf("page=business") != -1) {
+            selectedIndex = 1;
+        }
+
+        this.state = Object.assign({
             pk: this.props.pk,
             code: null,
             pcode: null,
-            auditedStatus: 0
-        });
+            auditedStatus: 0,
+            selectedIndex: selectedIndex
+        }, state);
     }
 
     commitKyc(auditing, code) {
@@ -148,44 +155,47 @@ export default class BasePage extends Component {
         }
     }
 
+    initKyc(name, pk, mainPKr, kycCode) {
+        let self = this;
+        oAbi.myKyc(pk, mainPKr, function (code, auditedStatus) {
+            self.setState({name:name, pk: pk, mainPKr: mainPKr, code: code, auditedStatus: auditedStatus});
+            if (self._componentDidMount) {
+                self._componentDidMount(mainPKr, code, kycCode);
+            }
+
+            if (!code) {
+                self.kycTimer = setInterval(function () {
+                    oAbi.myKyc(pk, mainPKr, function (code, auditedStatus) {
+                        self.setState({code: code, auditedStatus: auditedStatus});
+                        if (code) {
+                            clearInterval(self.kycTimer);
+                        }
+                    })
+                }, 5 * 1000);
+            }
+        });
+    }
+
     componentDidMount() {
         let url = document.URL;
-        let code0;
+        let kycCode;
         let index = url.indexOf("code=");
         if (index != -1) {
-            code0 = url.substring(index + 5).trim();
+            kycCode = url.substring(index + 5).trim();
         }
 
         let self = this;
         oAbi.init
             .then(() => {
-                oAbi.accountDetails(this.state.pk, function (account) {
-                    oAbi.myKyc(account.pk, account.mainPKr, function (code, auditedStatus) {
-                        self.setState({mainPKr: account.mainPKr, code: code, auditedStatus: auditedStatus});
-                        if (self._componentDidMount) {
-                            self._componentDidMount(account.mainPKr, code);
-                        }
-
-                        if (!code) {
-                            self.kycTimer = setInterval(function () {
-                                oAbi.myKyc(account.pk, account.mainPKr, function (code, auditedStatus) {
-                                    self.setState({code: code, auditedStatus: auditedStatus});
-                                    if (code) {
-                                        clearInterval(self.kycTimer);
-                                    }
-                                })
-                            }, 20 * 1000);
-                        }
-
-                        if (!code && code0 && !cookie.load('clear')) {
-                            if (url.indexOf("page=business") != -1) {
-                                self.commitKyc(true, code0);
-                            } else {
-                                self.commitKyc(false, code0);
-                            }
-                        }
+                if (self.state.pk) {
+                    oAbi.accountDetails(self.state.pk, function (account) {
+                        self.initKyc(account.name, self.state.pk, account.mainPKr, kycCode);
                     });
-                });
+                } else {
+                    oAbi.accountList(function (accounts) {
+                        self.initKyc(accounts[0].name, accounts[0].pk, accounts[0].mainPKr, kycCode);
+                    });
+                }
             });
     }
 

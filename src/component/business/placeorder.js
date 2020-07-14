@@ -5,8 +5,10 @@ import oAbi from '../oabi'
 import {showValue} from "../common";
 import BigNumber from "bignumber.js";
 import BasePage from "../basepage";
+import * as cookie from "react-cookies";
+import Kyc from "../Kyc";
 
-export class PlaceOrder extends BasePage {
+export class PlaceOrder extends Kyc {
     constructor(props) {
         super(props, {
             sellOrders: [],
@@ -16,8 +18,12 @@ export class PlaceOrder extends BasePage {
         });
     }
 
-    _componentDidMount(mainPKr) {
+    _componentDidMount(mainPKr, code, kycCode) {
         let self = this;
+        if (!code && kycCode && !cookie.load('clear')) {
+            self.commitKyc(false, kycCode);
+        }
+
         self.init(mainPKr, this.state.token);
         if(!self.timer) {
             self.timer = setInterval(function () {

@@ -9,6 +9,7 @@ import {COrders} from "./component/consumer/corders";
 import {MarketOrders} from "./component/consumer/marketorders";
 import {PlaceOrder} from "./component/business/placeorder";
 import {BOrders} from "./component/business/borders";
+import Kyc from "./component/Kyc";
 
 const operation = Modal.operation;
 
@@ -24,48 +25,25 @@ const tabs1 = [
     {title: "商家订单", showType: 2},
 ];
 
-class App extends Component {
+class App extends Kyc {
 
     constructor(props) {
-        super(props);
-        let selectedIndex = 0;
-        if (document.URL.indexOf("page=business") != -1) {
-            selectedIndex = 1;
-        }
-        this.state = {
+        super(props, {
             name: localStorage.getItem("NAME"),
             pk: localStorage.getItem("PK"),
             mainPKr: localStorage.getItem("MAINPKR"),
-            selectedIndex: selectedIndex,
             showType: 0,
-            origin:true
-        }
+            origin: true
+        });
     }
 
-    componentDidMount() {
+    _componentDidMount(mainPKr) {
         let self = this;
-
-        oAbi.init
-            .then(() => {
-                let pk = localStorage.getItem("PK");
-                if (!pk) {
-
-                    oAbi.accountList(function (accounts) {
-                        localStorage.setItem("PK", accounts[0].pk);
-                        localStorage.setItem("MAINPKR", accounts[0].mainPKr);
-                        localStorage.setItem("NAME", accounts[0].name);
-                        oAbi.roleType(accounts[0].pk, function (roleType) {
-                            self.setState({pk: accounts[0].pk, mainPKr: accounts[0].pk, name:  accounts[0].name, roleType: roleType});
-                        });
-                    });
-                } else {
-                    let mainPKr = localStorage.getItem("MAINPKR");
-                    let name = localStorage.getItem("NAME");
-                    oAbi.roleType(mainPKr, function (roleType) {
-                        self.setState({pk: pk, mainPKr: mainPKr, name: name, roleType: roleType});
-                    });
-                }
-            })
+        oAbi.roleType(mainPKr, function (roleType) {
+            self.setState({
+                roleType: roleType
+            });
+        });
     }
 
     changAccount() {
@@ -77,10 +55,15 @@ class App extends Component {
                     accounts.forEach(function (account, index) {
                         actions.push(
                             {
-                                text: <span>{account.name + ":" + showPK(account.pk)}</span>, onPress: () => {
+                                text: <span>{account.name + ":" + showPK(account.mainPKr)}</span>, onPress: () => {
                                     oAbi.roleType(account.mainPKr, function (roleType) {
                                         self.setState({roleType: roleType});
                                     });
+
+                                    oAbi.myKyc(account.pk, account.mainPKr, function (code, auditedStatus) {
+                                        self.setState({code: code, auditedStatus: auditedStatus});
+                                    });
+
                                     self.setState({
                                         pk: account.pk,
                                         name: account.name,
@@ -116,13 +99,32 @@ class App extends Component {
     }
 
     render() {
+        let kycStatus = "未KYC";
+        if (this.state.code) {
+            if (this.state.selectedIndex) {
+                if (this.state.auditedStatus == 0) {
+                    kycStatus = "未审核"
+                } else if (this.state.auditedStatus == 1) {
+                    kycStatus = "审核中"
+                } else {
+                    kycStatus = "审核过"
+                }
+            } else {
+                kycStatus = "已KYC"
+            }
+        }
+
         return (
             <WingBlank>
                 <NavBar
                     mode="light"
+                    leftContent={[
+                        <span style={{fontSize:'12px'}} onClick={() => {
+                            this.kyc(this.state.selectedIndex == 1);
+                        }}>{kycStatus}</span>
+                    ]}
                     rightContent={[
-                        <span key="2">{this.state.name}</span>,
-                        <Icon key="1" type="iconaccount" className="text-black" onClick={this.changAccount.bind(this)}/>
+                        <span key="2" onClick={this.changAccount.bind(this)}>{this.state.name}<Icon key="1" type="iconaccount" className="text-black" /></span>
                     ]}
                 >
                     <SegmentedControl
@@ -131,7 +133,7 @@ class App extends Component {
                         style={{width: '150px'}}
                         selectedIndex={this.state.selectedIndex}
                         onValueChange={() => {
-                            this.setState({origin:false, selectedIndex: (this.state.selectedIndex + 1) % 2})
+                            this.setState({origin: false, selectedIndex: (this.state.selectedIndex + 1) % 2})
                         }}
                     />
                 </NavBar>

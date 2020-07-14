@@ -45,7 +45,7 @@ export function showToken(token) {
 
 export function bytes32ToToken(data) {
     let bytes = Buffer.from(data.substring(2), "hex");
-    return String.fromCharCode.apply(String, bytes);;
+    return String.fromCharCode.apply(String, bytes).trim();
 }
 
 export function showPrice(price) {

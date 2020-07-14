@@ -7,10 +7,12 @@ import {showValue} from "../common";
 import BasePage from "../basepage";
 import language from '../language'
 import Iframe from "react-iframe";
+import * as cookie from "react-cookies";
+import Kyc from "../Kyc";
 
 const alert = Modal.alert;
 
-export class MarketOrders extends BasePage {
+export class MarketOrders extends Kyc {
     constructor(props) {
         super(props, {
             sellOrders: [],
@@ -19,7 +21,7 @@ export class MarketOrders extends BasePage {
             unit: 0,
             showSelect: false,
             showPopup: false,
-            payTypes:[],
+            payTypes: [],
             payType: 0,
             popup: "",
             pkr: "",
@@ -29,8 +31,12 @@ export class MarketOrders extends BasePage {
         });
     }
 
-    _componentDidMount(mainPKr) {
+    _componentDidMount(mainPKr, code, kycCode) {
         let self = this;
+        if (!code && kycCode && !cookie.load('clear')) {
+            self.commitKyc(false, kycCode);
+        }
+
         self.init(mainPKr, this.state.token);
 
         if (!self.timer) {
@@ -159,8 +165,8 @@ export class MarketOrders extends BasePage {
                                         oAbi.getPayTypes(item.hcode, function (list) {
                                             list.forEach((item) => {
                                                 payMethods.push(<Flex key={item.index}>
-                                                    <Flex.Item style={{flex:1}}>{item.type}</Flex.Item>
-                                                    <Flex.Item style={{flex:2}}>{item.channel}</Flex.Item>
+                                                    <Flex.Item style={{flex: 1}}>{item.type}</Flex.Item>
+                                                    <Flex.Item style={{flex: 2}}>{item.channel}</Flex.Item>
                                                 </Flex>)
                                             });
                                             Modal.alert("", payMethods);
@@ -184,7 +190,7 @@ export class MarketOrders extends BasePage {
                                         } else {
                                             oAbi.getPayTypes(item.hcode, function (list) {
                                                 self.setState({
-                                                    payType:list[0].index,
+                                                    payType: list[0].index,
                                                     payTypes: list, showPopup: true, id: item.id, pkr: item.pkr,
                                                     maxValue: item.order.value - item.order.dealtValue,
                                                     price: item.order.price
@@ -232,7 +238,7 @@ export class MarketOrders extends BasePage {
                                            }
                                            this.amountValue.value = value;
                                        }}/>
-                                <i className="icon" style={{top: '12px',color:"#000"}}>{this.state.token}</i>
+                                <i className="icon" style={{top: '12px', color: "#000"}}>{this.state.token}</i>
                             </div>
                         </List.Item>
                         {payTypeItems}
