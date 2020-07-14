@@ -118,7 +118,7 @@ export class BOrders extends Component {
                                 <Flex>
                                     <Flex.Item>数量({bytes32ToToken(item.order.token)})</Flex.Item>
                                     <Flex.Item>价格({oAbi.unitName(item.order.unit)})</Flex.Item>
-                                    <Flex.Item>已成交</Flex.Item>
+                                    <Flex.Item>成交量</Flex.Item>
                                 </Flex>
                                 <Flex>
                                     <Flex.Item>{showValue(item.order.value, 18, 4)}</Flex.Item>

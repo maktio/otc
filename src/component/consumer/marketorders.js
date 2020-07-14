@@ -42,7 +42,7 @@ export class MarketOrders extends Kyc {
         if (!self.timer) {
             self.timer = setInterval(function () {
                 self.init();
-            }, 5 * 1000);
+            }, 10 * 1000);
         }
     }
 
@@ -189,12 +189,25 @@ export class MarketOrders extends Kyc {
                                             this.kyc(false);
                                         } else {
                                             oAbi.getPayTypes(item.hcode, function (list) {
-                                                self.setState({
-                                                    payType: list[0].index,
-                                                    payTypes: list, showPopup: true, id: item.id, pkr: item.pkr,
-                                                    maxValue: item.order.value - item.order.dealtValue,
-                                                    price: item.order.price
-                                                });
+                                                if (orderType == 0) {
+                                                    oAbi.chargeRate(self.state.mainPKr, function (chargeRate) {
+                                                        self.setState({
+                                                            payType: list[0].index,
+                                                            payTypes: list, showPopup: true, id: item.id, pkr: item.pkr,
+                                                            maxValue: item.order.value - item.order.dealtValue,
+                                                            price: item.order.price,
+                                                            chargeRate: chargeRate,
+                                                            amount:0
+                                                        });
+                                                    });
+                                                } else {
+                                                    self.setState({
+                                                        payType: list[0].index,
+                                                        payTypes: list, showPopup: true, id: item.id, pkr: item.pkr,
+                                                        maxValue: item.order.value - item.order.dealtValue,
+                                                        price: item.order.price,
+                                                    });
+                                                }
                                             });
                                         }
                                     }}>
@@ -224,9 +237,18 @@ export class MarketOrders extends Kyc {
                     animationType="slide-up"
                 >
                     <List renderHeader={() => <div>委托买入</div>} className="popup-list">
-
                         <List.Item>
-                            <span>单价:{showValue(this.state.price, 9, 4)}{oAbi.unitName(this.state.unit)}</span>
+                            <Flex>
+                                <Flex.Item
+                                    style={{flex: 1}}><span>单价:{showValue(this.state.price, 9, 4)}{oAbi.unitName(this.state.unit)}</span></Flex.Item>
+                                {
+                                    orderType == 0 && <Flex.Item style={{flex: 2, textAlign:'right'}}>
+                                        <span>手续费:{this.state.chargeRate / 10000}%, 实收:{this.state.amount}</span>
+                                    </Flex.Item>
+                                }
+                            </Flex>
+
+
                         </List.Item>
                         <List.Item>
                             <div className="ui icon input" style={{width: "100%"}}>
@@ -237,6 +259,7 @@ export class MarketOrders extends Kyc {
                                                value = (value.match(/^\d*(\.?\d{0,4})/g)[0]) || null
                                            }
                                            this.amountValue.value = value;
+                                           this.setState({amount: value * (10000 - this.state.chargeRate) / 10000});
                                        }}/>
                                 <i className="icon" style={{top: '12px', color: "#000"}}>{this.state.token}</i>
                             </div>

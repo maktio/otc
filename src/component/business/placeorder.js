@@ -28,7 +28,7 @@ export class PlaceOrder extends Kyc {
         if(!self.timer) {
             self.timer = setInterval(function () {
                 self.init();
-            }, 5 * 1000);
+            }, 10 * 1000);
         }
     }
 

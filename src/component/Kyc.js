@@ -171,7 +171,7 @@ export default class Kyc extends Component {
                             clearInterval(self.kycTimer);
                         }
                     })
-                }, 5 * 1000);
+                }, 10 * 1000);
             }
         });
     }
