@@ -176,7 +176,7 @@ export class UserOrders extends Component {
                         <a onClick={() => {
                             oAbi.pkrDecrypt(self.state.pk, child.mcode, function (code1) {
                                 if (oAbi.code2(code1) === child.hcode) {
-                                    let url = "https://ahoj.xyz/levelInfo/code1/" + code1 + "?lang=cn";
+                                    let url = "https://ahoj.xyz/levelInfo/code1/" + code1 + "?lang=cn&pcindex"+child.order.payType;
                                     Modal.alert('', <Iframe url={url}
                                                             width="100%"
                                                             height="450px"
