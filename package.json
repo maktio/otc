@@ -32,7 +32,7 @@
   },
   "scripts": {
     "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
+    "build": "cross-env GENERATE_SOURCEMAP=false react-app-rewired build",
     "test": "react-app-rewired test --env=jsdom",
     "eject": "react-app-rewired eject"
   },
@@ -53,6 +53,7 @@
   },
   "devDependencies": {
     "babel-plugin-import": "^1.13.0",
+    "cross-env": "^7.0.2",
     "customize-cra": "^0.9.1",
     "react-app-rewired": "^2.1.6"
   }
