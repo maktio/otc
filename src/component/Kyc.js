@@ -183,8 +183,6 @@ export default class Kyc extends Component {
             if (self._componentDidMount) {
                 self._componentDidMount(account, code);
             }
-
-
         });
     }
 

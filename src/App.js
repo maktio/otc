@@ -45,6 +45,9 @@ class App extends Kyc {
         let self = this;
         oAbi.roleType(account.mainPKr, function (roleType) {
             oAbi.myKyc(account.pk, account.mainPKr, function (code, auditedStatus, info) {
+                if (!code) {
+                    self.startKycTimer(account.pk, account.mainPKr);
+                }
                 self.setState({
                     pk: account.pk,
                     name: account.name,
