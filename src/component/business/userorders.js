@@ -186,7 +186,7 @@ export class UserOrders extends Component {
                                     }
                                 });
                             } else {
-                                let code2 = oAbi.code2(oAbi.code1(this.state.code));
+                                let code2 = oAbi.code2(oAbi.code1(code));
                                 let url = "https://ahoj.xyz/levelInfo/code2/" + code2 + "?lang=cn&pcindex" + child.order.payType;
                                 Modal.alert('', <Iframe url={url}
                                                         width="100%"

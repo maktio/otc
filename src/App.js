@@ -119,7 +119,7 @@ class App extends Kyc {
                 <NavBar
                     mode="light"
                     leftContent={[
-                        <span style={{fontSize:'12px'}} onClick={() => {
+                        <span key={"0"} style={{fontSize:'12px'}} onClick={() => {
                             if (this.state.auditedStatus < 1) {
                                 this.kyc(this.state.selectedIndex == 1);
                             }
