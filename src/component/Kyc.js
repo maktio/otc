@@ -155,17 +155,17 @@ export default class Kyc extends Component {
         }
     }
 
-    initKyc(name, pk, mainPKr, kycCode) {
+    initKyc(account, kycCode) {
         let self = this;
-        oAbi.myKyc(pk, mainPKr, function (code, auditedStatus) {
-            self.setState({name:name, pk: pk, mainPKr: mainPKr, code: code, auditedStatus: auditedStatus});
+        oAbi.myKyc(account.pk, account.mainPKr, function (code, auditedStatus) {
+            self.setState({name:account.name, pk: account.pk, mainPKr: account.mainPKr,balances:account.balances, code: code, auditedStatus: auditedStatus});
             if (self._componentDidMount) {
-                self._componentDidMount(mainPKr, code, kycCode);
+                self._componentDidMount(account.mainPKr, code, kycCode);
             }
 
             if (!code) {
                 self.kycTimer = setInterval(function () {
-                    oAbi.myKyc(pk, mainPKr, function (code, auditedStatus) {
+                    oAbi.myKyc(account.pk, account.mainPKr, function (code, auditedStatus) {
                         self.setState({code: code, auditedStatus: auditedStatus});
                         if (code) {
                             clearInterval(self.kycTimer);
@@ -189,11 +189,11 @@ export default class Kyc extends Component {
             .then(() => {
                 if (self.state.pk) {
                     oAbi.accountDetails(self.state.pk, function (account) {
-                        self.initKyc(account.name, self.state.pk, account.mainPKr, kycCode);
+                        self.initKyc(account, kycCode);
                     });
                 } else {
                     oAbi.accountList(function (accounts) {
-                        self.initKyc(accounts[0].name, accounts[0].pk, accounts[0].mainPKr, kycCode);
+                        self.initKyc(accounts[0], kycCode);
                     });
                 }
             });

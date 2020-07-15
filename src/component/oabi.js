@@ -127,7 +127,13 @@ class OAbi {
         }
         let self = this;
         seropp.getAccountDetail(pk, function (item) {
-            callback({pk: item.PK, mainPKr: item.MainPKr, name: item.Name, balances: item.Balance})
+            let balances = new Map();
+            if (item.Balance) {
+                item.Balance.forEach((value, key) => {
+                    balances.set(key, value);
+                })
+            }
+            callback({pk: item.PK, mainPKr: item.MainPKr, name: item.Name, balances: balances})
         });
     }
 
@@ -135,11 +141,18 @@ class OAbi {
         seropp.getAccountList(function (data) {
             let accounts = [];
             data.forEach(function (item, index) {
+                let balances = new Map();
+                if (item.Balance) {
+                    item.Balance.forEach((value, key) => {
+                        balances.set(key, value);
+                    })
+                }
+
                 accounts.push({
                     pk: item.PK,
                     mainPKr: item.MainPKr,
                     name: item.Name,
-                    balances: item.Balance,
+                    balances: balances,
                 })
             });
             callback(accounts)

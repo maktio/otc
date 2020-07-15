@@ -72,6 +72,9 @@ export function showValueP(val, decimal, decimalPlaces) {
 }
 
 export function showValue(val, decimal, decimalPlaces) {
+    if(!val) {
+        return "0"
+    }
     let text = new BigNumber(val).dividedBy(new BigNumber(10).pow(decimal)).toFixed(decimalPlaces);
     return trimNumber(text, decimalPlaces)
 }

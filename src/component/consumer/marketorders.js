@@ -242,8 +242,12 @@ export class MarketOrders extends Kyc {
                                 <Flex.Item
                                     style={{flex: 1}}><span>单价:{showValue(this.state.price, 9, 4)}{oAbi.unitName(this.state.unit)}</span></Flex.Item>
                                 {
-                                    orderType == 0 && <Flex.Item style={{flex: 2, textAlign: 'right'}}>
+                                    orderType == 0 ? <Flex.Item style={{flex: 2, textAlign: 'right'}}>
                                         <span>手续费:{this.state.chargeRate / 10000}%, 实收:{this.state.amount}</span>
+                                    </Flex.Item> : <Flex.Item style={{flex: 2, textAlign: 'right'}}>
+                                        <div className="label" style={{color: '#888'}}>
+                                            账号可用余额: {showValue(this.state.balances.get(this.state.token), 18, 2)} {this.state.token}
+                                        </div>
                                     </Flex.Item>
                                 }
                             </Flex>

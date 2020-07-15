@@ -172,6 +172,12 @@ export class PlaceOrder extends Kyc {
                            }}/>
                     <i className="icon" style={{top: '12px',color:"#000"}}>{this.state.token}</i>
                 </div>
+                {
+                    orderType == 1 && <div className="label" style={{color: '#888'}}>
+                        账号可用余额: {showValue(this.state.balances.get(this.state.token),18,2)} {this.state.token}
+                    </div>
+                }
+
                 <WhiteSpace/>
                 <Flex style={{textAlign: "center"}}>
                     <Flex.Item>
@@ -199,6 +205,7 @@ export class PlaceOrder extends Kyc {
                             }}/>
                             <i className="icon" style={{top: '12px',color:"#000"}}>{this.state.token}</i>
                         </div>
+
                     </Flex.Item>
 
                 </Flex>
