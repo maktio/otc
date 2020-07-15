@@ -146,7 +146,13 @@ export class COrders extends Component {
 
                             <a onClick={() => {
                                 oAbi.pkrDecrypt(self.state.pk, item.mcode, function (code1) {
-                                    let url = "https://ahoj.xyz/levelInfo/code1/" + code1 + "?lang=cn&pcindex"+item.order.payType;
+                                    let url;
+                                    if (item.order.orderType == 0) {
+                                        url = "https://ahoj.xyz/levelInfo/code1/" + code1 + "?lang=cn&pcindex=" + item.order.payType;
+                                    } else {
+                                        url = "https://ahoj.xyz/levelInfo/code1/" + code1 + "?lang=cn";
+                                    }
+
                                     Modal.alert('支付信息', <div>
                                         <Iframe url={url}
                                                 width="100%"
