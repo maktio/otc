@@ -246,12 +246,11 @@ class OAbi {
         this.callMethod(contract, 'myKyc', from, [], function (rets) {
             if (rets[0] != "0x0000000000000000000000000000000000000000000000000000000000000000") {
                 self.pkrCrypto(pk, from, rets[0], function (code) {
-                    callback(code, rets[1]);
+                    callback(code, rets[1], rets[2]);
                 })
             } else {
-                callback(null, 0);
+                callback(null, 0, null);
             }
-            callback(rets[0] != "0x0000000000000000000000000000000000000000000000000000000000000000" ? rets[0] : null, rets[1]);
         });
     }
 

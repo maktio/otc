@@ -56,20 +56,24 @@ class App extends Kyc {
                         actions.push(
                             {
                                 text: <span>{account.name + ":" + showPK(account.mainPKr)}</span>, onPress: () => {
+                                    if (self.kycTimer) {
+                                        clearInterval(self.kycTimer);
+                                    }
                                     oAbi.roleType(account.mainPKr, function (roleType) {
-                                        self.setState({roleType: roleType});
+                                        oAbi.myKyc(account.pk, account.mainPKr, function (code, auditedStatus, info) {
+                                            console.log("myKyc", info);
+                                            self.setState({
+                                                pk: account.pk,
+                                                name: account.name,
+                                                mainPKr: account.mainPKr,
+                                                roleType: roleType,
+                                                code: code,
+                                                auditedStatus: auditedStatus,
+                                                info:info
+                                            });
+                                        });
                                     });
 
-                                    oAbi.myKyc(account.pk, account.mainPKr, function (code, auditedStatus) {
-                                        self.setState({code: code, auditedStatus: auditedStatus});
-                                    });
-
-                                    self.setState({
-                                        pk: account.pk,
-                                        name: account.name,
-                                        mainPKr: account.mainPKr,
-
-                                    });
                                     localStorage.setItem("NAME", account.name);
                                     localStorage.setItem("PK", account.pk);
                                     localStorage.setItem("MAINPKR", account.mainPKr);
@@ -107,10 +111,10 @@ class App extends Kyc {
                 } else if (this.state.auditedStatus == 1) {
                     kycStatus = "审核中"
                 } else {
-                    kycStatus = "已审核"
+                    kycStatus = this.state.info.name;
                 }
             } else {
-                kycStatus = "已KYC"
+                kycStatus = this.state.info.name;
             }
         }
 

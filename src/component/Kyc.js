@@ -19,6 +19,7 @@ export default class Kyc extends Component {
             pk: this.props.pk,
             code: null,
             pcode: null,
+            info:{},
             auditedStatus: 0,
             selectedIndex: selectedIndex
         }, state);
@@ -157,17 +158,25 @@ export default class Kyc extends Component {
 
     initKyc(account, kycCode) {
         let self = this;
-        oAbi.myKyc(account.pk, account.mainPKr, function (code, auditedStatus) {
-            self.setState({name:account.name, pk: account.pk, mainPKr: account.mainPKr,balances:account.balances, code: code, auditedStatus: auditedStatus});
+        oAbi.myKyc(account.pk, account.mainPKr, function (code, auditedStatus, info) {
+            self.setState({
+                name: account.name,
+                pk: account.pk,
+                mainPKr: account.mainPKr,
+                balances: account.balances,
+                code: code,
+                auditedStatus: auditedStatus,
+                info: info
+            });
             if (self._componentDidMount) {
                 self._componentDidMount(account.mainPKr, code, kycCode);
             }
 
             if (!code) {
                 self.kycTimer = setInterval(function () {
-                    oAbi.myKyc(account.pk, account.mainPKr, function (code, auditedStatus) {
-                        self.setState({code: code, auditedStatus: auditedStatus});
+                    oAbi.myKyc(account.pk, account.mainPKr, function (code, auditedStatus, info) {
                         if (code) {
+                            self.setState({code: code, auditedStatus: auditedStatus, info: info});
                             clearInterval(self.kycTimer);
                         }
                     })
