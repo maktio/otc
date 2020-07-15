@@ -62,7 +62,9 @@ export class MarketOrders extends Kyc {
         }
 
         oAbi.businessOrderList(mainPKr, token, unit, false, function (orders) {
-
+            if (!orders.length) {
+                return;
+            }
             let ids = [];
             let sellOrders = [];
             let buyOrders = [];
@@ -105,6 +107,35 @@ export class MarketOrders extends Kyc {
                 oAbi.exchangeSell(self.state.pk, self.state.mainPKr, mcode, orderId, self.state.token, amount, payType);
             }
         });
+    }
+
+    getPayTypes(orderType, item) {
+        let self = this;
+        if (orderType == 0) {
+            oAbi.getPayTypes(item.hcode, oAbi.unitName(self.state.unit), function (list) {
+                oAbi.chargeRate(self.state.mainPKr, function (chargeRate) {
+                    self.setState({
+                        payType: list[0].index,
+                        payTypes: list, showPopup: true, id: item.id, pkr: item.pkr,
+                        maxValue: item.order.value - item.order.dealtValue,
+                        price: item.order.price,
+                        chargeRate: chargeRate,
+                        amount: 0
+                    });
+                });
+            })
+
+        } else {
+            let code2 = oAbi.code2(oAbi.code1(this.state.code));
+            oAbi.getPayTypes(code2, oAbi.unitName(self.state.unit), function (list) {
+                self.setState({
+                    payType: list[0].index,
+                    payTypes: list, showPopup: true, id: item.id, pkr: item.pkr,
+                    maxValue: item.order.value - item.order.dealtValue,
+                    price: item.order.price,
+                });
+            })
+        }
     }
 
     render() {
@@ -188,27 +219,28 @@ export class MarketOrders extends Kyc {
                                         if (!this.state.code) {
                                             this.kyc(false);
                                         } else {
-                                            oAbi.getPayTypes(item.hcode, oAbi.unitName(self.state.unit),function (list) {
-                                                if (orderType == 0) {
-                                                    oAbi.chargeRate(self.state.mainPKr, function (chargeRate) {
-                                                        self.setState({
-                                                            payType: list[0].index,
-                                                            payTypes: list, showPopup: true, id: item.id, pkr: item.pkr,
-                                                            maxValue: item.order.value - item.order.dealtValue,
-                                                            price: item.order.price,
-                                                            chargeRate: chargeRate,
-                                                            amount: 0
-                                                        });
-                                                    });
-                                                } else {
-                                                    self.setState({
-                                                        payType: list[0].index,
-                                                        payTypes: list, showPopup: true, id: item.id, pkr: item.pkr,
-                                                        maxValue: item.order.value - item.order.dealtValue,
-                                                        price: item.order.price,
-                                                    });
-                                                }
-                                            });
+                                            this.getPayTypes(orderType, item);
+                                            // oAbi.getPayTypes(item.hcode, oAbi.unitName(self.state.unit),function (list) {
+                                            //     if (orderType == 0) {
+                                            //         oAbi.chargeRate(self.state.mainPKr, function (chargeRate) {
+                                            //             self.setState({
+                                            //                 payType: list[0].index,
+                                            //                 payTypes: list, showPopup: true, id: item.id, pkr: item.pkr,
+                                            //                 maxValue: item.order.value - item.order.dealtValue,
+                                            //                 price: item.order.price,
+                                            //                 chargeRate: chargeRate,
+                                            //                 amount: 0
+                                            //             });
+                                            //         });
+                                            //     } else {
+                                            //         self.setState({
+                                            //             payType: list[0].index,
+                                            //             payTypes: list, showPopup: true, id: item.id, pkr: item.pkr,
+                                            //             maxValue: item.order.value - item.order.dealtValue,
+                                            //             price: item.order.price,
+                                            //         });
+                                            //     }
+                                            // });
                                         }
                                     }}>
                                 {orderType == 1 ? language.e().order.sell : language.e().order.buy}
@@ -246,7 +278,7 @@ export class MarketOrders extends Kyc {
                                         <span>手续费:{this.state.chargeRate / 10000}%, 实收:{this.state.amount}</span>
                                     </Flex.Item> : <Flex.Item style={{flex: 2, textAlign: 'right'}}>
                                         <div className="label" style={{color: '#888'}}>
-                                            账号可用余额: {showValue(this.state.balances.get(this.state.token), 18, 2)} {this.state.token}
+                                            账号可用余额: {this.state.balances ? showValue(this.state.balances.get(this.state.token), 18, 2) : "0"} {this.state.token}
                                         </div>
                                     </Flex.Item>
                                 }

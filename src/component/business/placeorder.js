@@ -174,7 +174,7 @@ export class PlaceOrder extends Kyc {
                 </div>
                 {
                     orderType == 1 && <div className="label" style={{color: '#888'}}>
-                        账号可用余额: {showValue(this.state.balances.get(this.state.token),18,2)} {this.state.token}
+                        账号可用余额: {this.state.balances ? showValue(this.state.balances.get(this.state.token), 18, 2) : "0"} {this.state.token}
                     </div>
                 }
 

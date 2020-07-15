@@ -107,7 +107,7 @@ class App extends Kyc {
                 } else if (this.state.auditedStatus == 1) {
                     kycStatus = "审核中"
                 } else {
-                    kycStatus = "审核过"
+                    kycStatus = "已审核"
                 }
             } else {
                 kycStatus = "已KYC"
