@@ -354,12 +354,12 @@ class OAbi {
         return "0x" + new BigNumber(big).toString(16)
     }
 
-    businessSell(pk, mainPKr, tokenName, value, minValue, maxValue, price, unit, callback) {
-        this.executeMethod(contract, 'businessSell', pk, mainPKr, [this.bigToHex(minValue), this.bigToHex(maxValue), this.bigToHex(price), unit, ""], tokenName, value, callback);
+    businessSell(pk, mainPKr, tokenName, value, minValue, maxValue, price, unit, remark, callback) {
+        this.executeMethod(contract, 'businessSell', pk, mainPKr, [this.bigToHex(minValue), this.bigToHex(maxValue), this.bigToHex(price), unit, remark], tokenName, value, callback);
     }
 
-    businessBuy(pk, mainPKr, tokenName, value, minValue, maxValue, price, unit, callback) {
-        this.executeMethod(contract, 'businessBuy', pk, mainPKr, [tokenName, this.bigToHex(value), this.bigToHex(minValue), this.bigToHex(maxValue), this.bigToHex(price), unit, ""], "SERO", 0, callback);
+    businessBuy(pk, mainPKr, tokenName, value, minValue, maxValue, price, unit, remark, callback) {
+        this.executeMethod(contract, 'businessBuy', pk, mainPKr, [tokenName, this.bigToHex(value), this.bigToHex(minValue), this.bigToHex(maxValue), this.bigToHex(price), unit, remark], "SERO", 0, callback);
     }
 
     refused(pk, mainPKr, orderId, callback) {

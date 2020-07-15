@@ -207,45 +207,29 @@ export class MarketOrders extends Kyc {
                                     </a>
                                 </Flex.Item>
                             </Flex>
+                            <WhiteSpace/>
+                            <Flex>
+                                <Flex.Item>
+                                    <div>
+                                        <div>数量: {showValue(value, 18, 4)}</div>
+                                        <div>限额: {showValue(item.order.minDealValue, 18, 0)}-{showValue(item.order.maxDealValue, 18, 4)}</div>
+                                    </div>
+                                </Flex.Item>
+                                <Flex.Item style={{textAlign:'right'}}>
+                                    <Button type="ghost" inline size="small" style={{marginRight: '4px'}}
+                                            onClick={() => {
+                                                if (!this.state.code) {
+                                                    this.kyc(false);
+                                                } else {
+                                                    this.getPayTypes(orderType, item);
+                                                }
+                                            }}>
+                                        {orderType == 1 ? language.e().order.sell : language.e().order.buy}
+                                    </Button>
+                                </Flex.Item>
+                            </Flex>
                         </Card.Body>
-                        <Card.Footer content={
-                            <div>
-                                <div>数量: {showValue(value, 18, 4)}</div>
-                                <div>限额: {showValue(item.order.minDealValue, 18, 0)}-{showValue(item.order.maxDealValue, 18, 4)}</div>
-                            </div>
-                        } extra={
-                            <Button type="ghost" inline size="small" style={{marginRight: '4px'}}
-                                    onClick={() => {
-                                        if (!this.state.code) {
-                                            this.kyc(false);
-                                        } else {
-                                            this.getPayTypes(orderType, item);
-                                            // oAbi.getPayTypes(item.hcode, oAbi.unitName(self.state.unit),function (list) {
-                                            //     if (orderType == 0) {
-                                            //         oAbi.chargeRate(self.state.mainPKr, function (chargeRate) {
-                                            //             self.setState({
-                                            //                 payType: list[0].index,
-                                            //                 payTypes: list, showPopup: true, id: item.id, pkr: item.pkr,
-                                            //                 maxValue: item.order.value - item.order.dealtValue,
-                                            //                 price: item.order.price,
-                                            //                 chargeRate: chargeRate,
-                                            //                 amount: 0
-                                            //             });
-                                            //         });
-                                            //     } else {
-                                            //         self.setState({
-                                            //             payType: list[0].index,
-                                            //             payTypes: list, showPopup: true, id: item.id, pkr: item.pkr,
-                                            //             maxValue: item.order.value - item.order.dealtValue,
-                                            //             price: item.order.price,
-                                            //         });
-                                            //     }
-                                            // });
-                                        }
-                                    }}>
-                                {orderType == 1 ? language.e().order.sell : language.e().order.buy}
-                            </Button>
-                        }/>
+                        <Card.Footer content="" extra={item.order.information}/>
                     </Card>
                 </div>
             )
@@ -283,9 +267,8 @@ export class MarketOrders extends Kyc {
                                     </Flex.Item>
                                 }
                             </Flex>
-
-
                         </List.Item>
+
                         <List.Item>
                             <div className="ui icon input" style={{width: "100%"}}>
                                 <input type="text" placeholder="amount" ref={el => this.amountValue = el}

@@ -210,6 +210,17 @@ export class PlaceOrder extends Kyc {
 
                 </Flex>
                 <WhiteSpace/>
+                <Flex style={{textAlign: "center"}}>
+                    <Flex.Item>
+                        <div className="ui icon input" style={{width: "100%"}}>
+                            <input type="text" placeholder="remark" style={{paddingRight: "10px"}}
+                                   ref={el => this.remarkValue = el} onChange={(event) => {
+                                this.remarkValue.value = event.target.value;
+                            }}/>
+                        </div>
+                    </Flex.Item>
+                </Flex>
+                <WhiteSpace/>
                 <Flex>
                     <Flex.Item>
                         <Button type={orderType == 0?"primary":"warning"} onClick={() => {
@@ -230,6 +241,7 @@ export class PlaceOrder extends Kyc {
                                 let min = new BigNumber(this.minValue.value).multipliedBy(new BigNumber(10).pow(18));
                                 let max = new BigNumber(this.maxValue.value).multipliedBy(new BigNumber(10).pow(18));
                                 let price = new BigNumber(this.priceValue.value).multipliedBy(1000000000);
+                                let remark = this.remarkValue.value;
 
                                 if (price.isZero()) {
                                     Toast.fail("price is zero")
@@ -257,9 +269,9 @@ export class PlaceOrder extends Kyc {
                                 }
 
                                 if (orderType === 1) {
-                                    oAbi.businessSell(this.state.pk, this.state.mainPKr, this.state.token, value, min, max, price, this.state.unit);
+                                    oAbi.businessSell(this.state.pk, this.state.mainPKr, this.state.token, value, min, max, price, this.state.unit, remark);
                                 } else {
-                                    oAbi.businessBuy(this.state.pk, this.state.mainPKr, this.state.token, value, min, max, price, this.state.unit);
+                                    oAbi.businessBuy(this.state.pk, this.state.mainPKr, this.state.token, value, min, max, price, this.state.unit, remark);
                                 }
                             }
                         }}>{orderType == 0 ? "立即买入" : "立即卖出"}</Button>

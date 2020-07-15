@@ -142,8 +142,7 @@ export class COrders extends Component {
                     </Card.Body>
                     <Card.Footer extra={<div>
                          <span>
-                        {item.order.status == 2 ?
-
+                        {item.order.status != 1 ?
                             <a onClick={() => {
                                 oAbi.pkrDecrypt(self.state.pk, item.mcode, function (code1) {
                                     let url;
