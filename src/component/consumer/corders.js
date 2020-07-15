@@ -5,7 +5,6 @@ import oAbi from '../oabi'
 import {bytes32ToToken, formatDate, showValue} from "../common";
 import BigNumber from 'bignumber.js'
 import language from '../language'
-import Iframe from "react-iframe";
 
 const alert = Modal.alert;
 
@@ -25,7 +24,7 @@ export class COrders extends Component {
                         self.init(account.mainPKr);
                         self.timer = setInterval(function () {
                             self.init();
-                        }, 5 * 1000);
+                        }, 10 * 1000);
                     });
                 });
             });
@@ -152,23 +151,27 @@ export class COrders extends Component {
                                         url = "https://ahoj.xyz/levelInfo/code1/" + code1 + "?lang=cn";
                                     }
 
-                                    Modal.alert('支付信息', <div>
-                                        <Iframe url={url}
+                                    Modal.alert('', <div>
+                                        <iframe src={url}
                                                 width="100%"
-                                                height="450px"
+                                                height={document.documentElement.clientHeight * 0.7}
                                                 display="initial"
-                                                position="relative"/>
+                                                position="relative"
+                                                frameBorder="no"
+                                        />
                                     </div>);
                                 });
                             }
                             }>支付信息</a> : <a onClick={() => {
                                 let url = "https://ahoj.xyz/levelInfo/code2/" + item.hcode + "?lang=cn";
-                                Modal.alert(language.e().order.tips8, <div>
-                                    <Iframe url={url}
+                                Modal.alert('', <div>
+                                    <iframe src={url}
                                             width="100%"
-                                            height="450px"
+                                            height={document.documentElement.clientHeight * 0.7}
                                             display="initial"
-                                            position="relative"/>
+                                            position="relative"
+                                            frameBorder="no"
+                                    />
                                 </div>);
                             }}>{language.e().order.tips8}</a>
                         }

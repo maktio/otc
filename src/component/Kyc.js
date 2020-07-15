@@ -1,19 +1,15 @@
 import React, {Component} from "react";
 import oAbi from "./oabi";
-import {Modal, WhiteSpace} from "antd-mobile";
+import {Flex, Icon, Modal, WhiteSpace} from "antd-mobile";
 import {hash, randomByte32, urlParse} from "./common";
 import language from './language'
 import * as cookie from "react-cookies";
+import Iframe from "react-iframe";
 
 export default class Kyc extends Component {
 
     constructor(props, state) {
         super(props);
-
-        let selectedIndex = 0;
-        if (document.URL.indexOf("page=business") != -1) {
-            selectedIndex = 1;
-        }
 
         this.state = Object.assign({
             pk: this.props.pk,
@@ -21,8 +17,23 @@ export default class Kyc extends Component {
             pcode: null,
             info:{},
             auditedStatus: 0,
-            selectedIndex: selectedIndex
+            selectedIndex: 0,
+            modal:true
         }, state);
+    }
+
+    startKycTimer(pk, mainPKr) {
+        let self = this;
+        if (!self.kycTimer) {
+            self.kycTimer = setInterval(function () {
+                oAbi.myKyc(pk, mainPKr, function (code, auditedStatus, info) {
+                    if (code) {
+                        self.setState({code: code, auditedStatus: auditedStatus, info: info});
+                        clearInterval(self.kycTimer);
+                    }
+                })
+            }, 10 * 1000);
+        }
     }
 
     commitKyc(auditing, code) {
@@ -32,23 +43,15 @@ export default class Kyc extends Component {
         }
         this.modal = Modal.alert(language.e().kyc.title2,
             <div>
-                <div className="ui input"><input type="text" placeholder="nickname"
+                <div className="ui input" style={{width:'80%'}}><input type="text" placeholder="nickname"
                                                  onChange={(event) => {
                                                      self.nameValue.value = event.target.value.trim();
                                                  }}
                                                  ref={el => self.nameValue = el}/></div>
-                <WhiteSpace/>
-                {/*<div className="ui input"><input type="text" value={code}*/}
-                {/*                                 onChange={(event) => {*/}
-                {/*                                     self.codeValue.value = event.target.value;*/}
-                {/*                                 }}*/}
-                {/*                                 ref={el => self.codeValue = el}/></div>*/}
-                <WhiteSpace/>
             </div>,
             [
                 {
                     text: <span>{language.e().modal.cancel}</span>, onPress: () => {
-                        window.location.href = document.location.origin + document.location.pathname;
                     }
                 },
                 {
@@ -77,15 +80,18 @@ export default class Kyc extends Component {
                                             Modal.alert('', '不支持老账户',);
                                             return;
                                         }
-
                                         oAbi.registerKyc(self.state.pk, self.state.mainPKr, name, code2, ecode, pcode, function (res, error) {
-                                            window.location.href = document.location.origin + document.location.pathname;
+                                            if(!error) {
+                                                self.startKycTimer(self.state.pk, self.state.mainPKr);
+                                            }
                                         });
                                     });
                                 });
                             } else {
                                 oAbi.registerKyc(self.state.pk, self.state.mainPKr, name, code2, ecode, "0x", function (res, error) {
-                                    window.location.href = document.location.origin + document.location.pathname;
+                                    if(!error) {
+                                        self.startKycTimer(self.state.pk, self.state.mainPKr);
+                                    }
                                 });
                             }
                         });
@@ -98,28 +104,34 @@ export default class Kyc extends Component {
         let self = this;
         if (!this.state.code) {
             if (cookie.load('hasRegister')) {
-                Modal.alert("已提交请稍等", "",
-                    [
-                        {text: <span>{language.e().modal.cancel}</span>},
-                        {
-                            text: <span>{language.e().modal.ok}</span>, onPress: () => {
-                            }
-                        },
-                    ])
+                Modal.alert("已提交请稍等", "",)
             } else {
                 Modal.alert(language.e().kyc.title1, language.e().kyc.msg1,
                     [
                         {text: <span>{language.e().modal.cancel}</span>},
                         {
                             text: <span>{language.e().modal.ok}</span>, onPress: () => {
-                                let host = document.location.origin + document.location.pathname;
-                                var urlenc;
-                                if (auditing) {
-                                    urlenc = encodeURIComponent(host + "/?page=business&code=codeId");
-                                } else {
-                                    urlenc = encodeURIComponent(host + "/?page=customer&code=codeId");
-                                }
-                                window.location.href = "https://ahoj.xyz/profile?lang=cn&force=" + this.state.code + "&ref=" + urlenc;
+                                let url = "https://ahoj.xyz/login?lang=cn&force=" + this.state.code
+                                let kyc = Modal.alert(<div style={{textAlign:'right'}}>
+                                    <span style={{}} onClick={() => {
+                                        kyc.close();
+                                    }
+                                    }><Icon type={"cross"}/></span>
+                                </div>, <div style={{witdh: "40%"}}>
+                                    <iframe src={url}
+                                            width="100%"
+                                            height={document.documentElement.clientHeight * 0.7}
+                                            display="initial"
+                                            position="relative"
+                                            frameBorder="no"
+                                    />
+                                </div>, []);
+                                window.addEventListener("message", function (msg) {
+                                    if (msg.origin == "https://ahoj.xyz" && msg.data && msg.data.code0) {
+                                        self.commitKyc(self.state.selectedIndex == 1, msg.data.code0);
+                                        kyc.close();
+                                    }
+                                }, {passive: true});
                             }
                         },
                     ])
@@ -156,7 +168,7 @@ export default class Kyc extends Component {
         }
     }
 
-    initKyc(account, kycCode) {
+    initKyc(account) {
         let self = this;
         oAbi.myKyc(account.pk, account.mainPKr, function (code, auditedStatus, info) {
             self.setState({
@@ -169,40 +181,24 @@ export default class Kyc extends Component {
                 info: info
             });
             if (self._componentDidMount) {
-                self._componentDidMount(account.mainPKr, code, kycCode);
+                self._componentDidMount(account, code);
             }
 
-            if (!code) {
-                self.kycTimer = setInterval(function () {
-                    oAbi.myKyc(account.pk, account.mainPKr, function (code, auditedStatus, info) {
-                        if (code) {
-                            self.setState({code: code, auditedStatus: auditedStatus, info: info});
-                            clearInterval(self.kycTimer);
-                        }
-                    })
-                }, 10 * 1000);
-            }
+
         });
     }
 
     componentDidMount() {
-        let url = document.URL;
-        let kycCode;
-        let index = url.indexOf("code=");
-        if (index != -1) {
-            kycCode = url.substring(index + 5).trim();
-        }
-
         let self = this;
         oAbi.init
             .then(() => {
                 if (self.state.pk) {
                     oAbi.accountDetails(self.state.pk, function (account) {
-                        self.initKyc(account, kycCode);
+                        self.initKyc(account);
                     });
                 } else {
                     oAbi.accountList(function (accounts) {
-                        self.initKyc(accounts[0], kycCode);
+                        self.initKyc(accounts[0]);
                     });
                 }
             });
@@ -210,17 +206,25 @@ export default class Kyc extends Component {
 
     componentWillReceiveProps(nextProps) {
         let self = this;
+        if(this.kycTimer) {
+            clearInterval(this.kycTimer);
+        }
         if (nextProps.pk != this.props.pk) {
             oAbi.accountDetails(nextProps.pk, function (account) {
                 oAbi.myKyc(account.pk, account.mainPKr, function (code, auditedStatus) {
                     self.setState({
-                        pk: nextProps.pk,
+                        pk: account.pk,
                         mainPKr: account.mainPKr,
                         code: code,
                         auditedStatus: auditedStatus
                     });
-                    if (self.init) {
-                        self.init(account.mainPKr);
+
+                    if(!code) {
+                        self.startKycTimer(account.pk, account.mainPKr)
+                    }
+
+                    if (self._init) {
+                        self._init(account.mainPKr);
                     }
                 })
             });

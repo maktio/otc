@@ -37,11 +37,23 @@ class App extends Kyc {
         });
     }
 
-    _componentDidMount(mainPKr) {
+    _componentDidMount(account) {
+        this.init(account);
+    }
+
+    init(account) {
         let self = this;
-        oAbi.roleType(mainPKr, function (roleType) {
-            self.setState({
-                roleType: roleType
+        oAbi.roleType(account.mainPKr, function (roleType) {
+            oAbi.myKyc(account.pk, account.mainPKr, function (code, auditedStatus, info) {
+                self.setState({
+                    pk: account.pk,
+                    name: account.name,
+                    mainPKr: account.mainPKr,
+                    roleType: roleType,
+                    code: code,
+                    auditedStatus: auditedStatus,
+                    info: info
+                });
             });
         });
     }
@@ -59,21 +71,7 @@ class App extends Kyc {
                                     if (self.kycTimer) {
                                         clearInterval(self.kycTimer);
                                     }
-                                    oAbi.roleType(account.mainPKr, function (roleType) {
-                                        oAbi.myKyc(account.pk, account.mainPKr, function (code, auditedStatus, info) {
-                                            console.log("myKyc", info);
-                                            self.setState({
-                                                pk: account.pk,
-                                                name: account.name,
-                                                mainPKr: account.mainPKr,
-                                                roleType: roleType,
-                                                code: code,
-                                                auditedStatus: auditedStatus,
-                                                info:info
-                                            });
-                                        });
-                                    });
-
+                                    self.init(account);
                                     localStorage.setItem("NAME", account.name);
                                     localStorage.setItem("PK", account.pk);
                                     localStorage.setItem("MAINPKR", account.mainPKr);
@@ -173,7 +171,6 @@ class App extends Kyc {
                 {
                     this.state.roleType > 0 && <AuditingList roleType={this.state.roleType} pk={this.state.pk}/>
                 }
-
             </WingBlank>
         )
     }

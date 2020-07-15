@@ -4,8 +4,6 @@ import 'semantic-ui-css/semantic.min.css';
 import oAbi from '../oabi'
 import {showValue} from "../common";
 import BigNumber from "bignumber.js";
-import BasePage from "../basepage";
-import * as cookie from "react-cookies";
 import Kyc from "../Kyc";
 
 export class PlaceOrder extends Kyc {
@@ -18,28 +16,21 @@ export class PlaceOrder extends Kyc {
         });
     }
 
-    _componentDidMount(mainPKr, code, kycCode) {
+    _componentDidMount(account, code) {
         let self = this;
-        if (!code && kycCode && !cookie.load('clear')) {
-            self.commitKyc(false, kycCode);
-        }
+        self._init(account.mainPKr, this.state.token);
 
-        self.init(mainPKr, this.state.token);
+        if (!code) {
+            self.startKycTimer(account.pk, account.mainPKr);
+        }
         if(!self.timer) {
             self.timer = setInterval(function () {
-                self.init();
+                self._init();
             }, 10 * 1000);
         }
     }
 
-    _componentWillReceiveProps(nextProps) {
-        let self = this;
-        if (nextProps.orderType != this.props.orderType) {
-            this.setState({orderType: nextProps.orderType});
-        }
-    }
-
-    init(mainPKr, token, unit) {
+    _init(mainPKr, token, unit) {
         if (!mainPKr) {
             mainPKr = this.state.mainPKr;
         }

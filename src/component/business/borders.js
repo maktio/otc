@@ -2,8 +2,7 @@ import React, {Component} from 'react';
 import 'semantic-ui-css/semantic.min.css';
 import oAbi from '../oabi'
 import {Brief, Button, Card, Flex, Icon, List, Modal, Radio, WhiteSpace} from "antd-mobile";
-import {bytes32ToToken, randomByte32, showValue, formatDate} from "../common";
-import BasePage from "../basepage";
+import {bytes32ToToken, showValue} from "../common";
 import BigNumber from 'bignumber.js'
 import language from '../language'
 import {UserOrders} from "./userorders";
@@ -43,7 +42,7 @@ export class BOrders extends Component {
                         if(!self.timer) {
                             self.timer = setInterval(function () {
                                 self.init();
-                            }, 5 * 1000);
+                            }, 10 * 1000);
                         }
                     });
                 });

@@ -4,10 +4,7 @@ import 'semantic-ui-css/semantic.min.css';
 import oAbi from '../oabi'
 import BigNumber from "bignumber.js";
 import {showValue} from "../common";
-import BasePage from "../basepage";
 import language from '../language'
-import Iframe from "react-iframe";
-import * as cookie from "react-cookies";
 import Kyc from "../Kyc";
 
 const alert = Modal.alert;
@@ -31,22 +28,22 @@ export class MarketOrders extends Kyc {
         });
     }
 
-    _componentDidMount(mainPKr, code, kycCode) {
+    _componentDidMount(account, code) {
         let self = this;
-        if (!code && kycCode && !cookie.load('clear')) {
-            self.commitKyc(false, kycCode);
-        }
+        self._init(account.mainPKr, this.state.token);
 
-        self.init(mainPKr, this.state.token);
+        if (!code) {
+            self.startKycTimer(account.pk, account.mainPKr);
+        }
 
         if (!self.timer) {
             self.timer = setInterval(function () {
-                self.init();
+                self._init();
             }, 10 * 1000);
         }
     }
 
-    init(mainPKr, token, unit) {
+    _init(mainPKr, token, unit) {
         let self = this;
         if (!mainPKr) {
             mainPKr = this.state.mainPKr;
@@ -171,11 +168,13 @@ export class MarketOrders extends Kyc {
                                     <div className="active section">
                                         <a onClick={() => {
                                             let url = "https://ahoj.xyz/levelInfo/code2/" + item.hcode + "?lang=cn";
-                                            alert(language.e().order.tips8, <Iframe url={url}
+                                            alert('', <iframe src={url}
                                                                                     width="100%"
-                                                                                    height="450px"
+                                                                                    height={document.documentElement.clientHeight * 0.7}
                                                                                     display="initial"
-                                                                                    position="relative"/>
+                                                                                    position="relative"
+                                                                                    frameBorder="no"
+                                                />
                                             )
                                         }}>{language.e().order.tips8}</a>
                                     </div>
@@ -195,9 +194,9 @@ export class MarketOrders extends Kyc {
                                         let payMethods = []
                                         oAbi.getPayTypes(item.hcode, oAbi.unitName(self.state.unit), function (list) {
                                             list.forEach((item) => {
-                                                payMethods.push(<Flex key={item.index}>
+                                                payMethods.push(<Flex key={item.index} style={{textAlign:'center'}}>
                                                     <Flex.Item style={{flex: 1}}>{item.type}</Flex.Item>
-                                                    <Flex.Item style={{flex: 2}}>{item.channel}</Flex.Item>
+                                                    <Flex.Item style={{flex: 1}}>{item.channel}</Flex.Item>
                                                 </Flex>)
                                             });
                                             Modal.alert("", payMethods);

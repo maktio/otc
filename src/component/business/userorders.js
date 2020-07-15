@@ -2,10 +2,9 @@ import React, {Component} from 'react';
 import 'semantic-ui-css/semantic.min.css';
 import oAbi from '../oabi'
 import {Brief, Button, Card, Flex, Icon, List, Modal, Radio, WhiteSpace} from "antd-mobile";
-import {bytes32ToToken, randomByte32, showValue, formatDate} from "../common";
+import {bytes32ToToken, showValue, formatDate} from "../common";
 import BigNumber from 'bignumber.js'
 import language from '../language'
-import Iframe from "react-iframe";
 
 const alert = Modal.alert;
 
@@ -178,21 +177,25 @@ export class UserOrders extends Component {
                                 oAbi.pkrDecrypt(self.state.pk, child.mcode, function (code1) {
                                     if (oAbi.code2(code1) === child.hcode) {
                                         let url = "https://ahoj.xyz/levelInfo/code1/" + code1 + "?lang=cn&pcindex" + child.order.payType;
-                                        Modal.alert('', <Iframe url={url}
+                                        Modal.alert('', <iframe src={url}
                                                                 width="100%"
-                                                                height="450px"
+                                                                height={document.documentElement.clientHeight * 0.7}
                                                                 display="initial"
-                                                                position="relative"/>);
+                                                                position="relative"
+                                                                frameBorder="no"
+                                        />);
                                     }
                                 });
                             } else {
                                 let code2 = oAbi.code2(oAbi.code1(code));
                                 let url = "https://ahoj.xyz/levelInfo/code2/" + code2 + "?lang=cn&pcindex" + child.order.payType;
-                                Modal.alert('', <Iframe url={url}
+                                Modal.alert('', <iframe src={url}
                                                         width="100%"
-                                                        height="450px"
+                                                        height={document.documentElement.clientHeight * 0.7}
                                                         display="initial"
-                                                        position="relative"/>);
+                                                        position="relative"
+                                                        frameBorder="no"
+                                />);
                             }
                         }}>{orderType == 0 ? "支付信息":"收款信息"}</a>
                     </span>}/>
