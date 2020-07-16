@@ -118,7 +118,8 @@ export class PlaceOrder extends Kyc {
                                  self.dropdown.className = "ui dropdown active visible";
                                  self.menu.className = "menu transition visible";
                              }}>
-                            <div className="text">{oAbi.unitName(this.state.unit)}</div>
+                            <div className="text"
+                                 style={{width: '35px', paddingLeft: '5px'}}>{oAbi.unitName(this.state.unit)}</div>
                             <i className="dropdown icon"></i>
                             <div className="menu transition hidden" ref={el => this.menu = el}>
 

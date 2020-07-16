@@ -346,7 +346,8 @@ export class MarketOrders extends Kyc {
                                  this.dropdown.className = "ui dropdown active visible";
                                  this.menu.className = "menu transition visible";
                              }}>
-                            <div className="text">{oAbi.unitName(this.state.unit)}</div>
+                            <div className="text"
+                                 style={{width: '35px', paddingLeft: '5px'}}>{oAbi.unitName(this.state.unit)}</div>
                             <i className="dropdown icon"></i>
                             <div className="menu transition hidden" ref={el => this.menu = el}>
                                 {
@@ -355,8 +356,15 @@ export class MarketOrders extends Kyc {
                                             <div className="item" onClick={(e) => {
                                                 this.dropdown.className = "ui dropdown ";
                                                 this.menu.className = "menu transition hidden";
-                                                this.setState({unit: each[0], showSelect: false});
-                                                this._init(this.state.mainPKr, null, each[0]);
+                                                if (each[0] != self.state.unit) {
+                                                    this.setState({
+                                                        unit: each[0],
+                                                        showSelect: false,
+                                                        sellOrders: [],
+                                                        buyOrders: []
+                                                    });
+                                                    this._init(this.state.mainPKr, null, each[0]);
+                                                }
                                                 e.stopPropagation();
                                             }}>{each[1]}
                                             </div>

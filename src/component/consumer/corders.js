@@ -64,9 +64,12 @@ export class COrders extends Component {
     }
 
     render() {
+        let closeStyle={color:'#ddd'};
+
         let self = this;
         let showOrders = this.state.orders.map((item, index) => {
             let text = "";
+            let finished = false;
             if (item.order.status == 1) {
                 text = language.e().order.tips1;
             } else if (item.order.status == 2) {
@@ -89,10 +92,13 @@ export class COrders extends Component {
                     </span>
                 }
             } else if (item.order.status == 3) {
+                finished  = true;
                 text = language.e().order.tips3;
             } else if (item.order.status == 4) {
+                finished  = true;
                 text = language.e().order.tips4;
             } else if (item.order.status == 5) {
+                finished  = true;
                 text = language.e().order.tips5;
             } else if (item.order.status == 6) {
                 text = "仲裁中"
@@ -119,12 +125,12 @@ export class COrders extends Component {
                 <Card>
                     <Card.Header
                         title={
-                            <span>{item.order.orderType == 0 ? language.e().order.buy : language.e().order.sell} {bytes32ToToken(item.order.token)}</span>}
-                        extra={<div><span style={{float: 'left'}}>ID: {item.id}</span>&nbsp;&nbsp;&nbsp;<span
+                            <span style={finished ? closeStyle : {}}>{item.order.orderType == 0 ? language.e().order.buy : language.e().order.sell} {bytes32ToToken(item.order.token)}</span>}
+                        extra={<div style={finished ? closeStyle : {}}><span style={{float: 'left'}}>ID: {item.id}</span>&nbsp;&nbsp;&nbsp;<span
                             style={{textAlign: 'right'}}>{status}</span></div>}
                     />
                     <Card.Body>
-                        <Flex style={{}}>
+                        <Flex style={finished ? closeStyle : {}}>
                             <Flex.Item style={{flex: 3,textAlign: 'left'}}>
                                 <div>{language.e().order.time}</div>
                                 <div>{formatDate(new Date(item.order.createTime * 1000))}</div>
@@ -139,7 +145,7 @@ export class COrders extends Component {
                             </Flex.Item>
                         </Flex>
                     </Card.Body>
-                    <Card.Footer extra={<div>
+                    <Card.Footer extra={<div style={finished ? closeStyle : {}}>
                          <span>
                         {item.order.status != 1 ?
                             <a onClick={() => {

@@ -52,8 +52,11 @@ export class UserOrders extends Component {
     render() {
         let self = this;
         const {code, orderType} = this.props;
+        let closeStyle={color:'#ddd'};
+
         let ordersHtml = this.state.orders.map((child, index) => {
             let html;
+            let finished = false;
             if (child.order.status == 1) {
                 html = <div className="ui breadcrumb">
                     <a className="section" onClick={() => {
@@ -140,22 +143,25 @@ export class UserOrders extends Component {
             } else {
                 let text;
                 if (child.order.status == 3) {
+                    finished = true;
                     text = language.e().order.tips3;
                 } else if (child.order.status == 4) {
+                    finished = true;
                     text = language.e().order.tips4;
                 } else if (child.order.status == 5) {
+                    finished = true;
                     text = language.e().order.tips5;
                 } if (child.order.status == 6) {
                     text = "仲裁中"
                 }
-                html = <span>{text}</span>
+                html = <span style={finished ? closeStyle : {}}>{text}</span>
             }
 
             return <div className="item" key={index}>
                 <Card>
                     <Card.Header
                         title={
-                            <div className="ui breadcrumb">
+                            <div className="ui breadcrumb" style={finished ? closeStyle : {}}>
                                 <div className="section">ID:{child.id}</div>
                                 <div className="divider"></div>
                                 <div className="active section">{child.name}</div>
@@ -164,14 +170,14 @@ export class UserOrders extends Component {
                         extra={html}
                     />
                     <Card.Body>
-                        <div>
+                        <div style={finished ? closeStyle : {}}>
                             <Flex style={{fontSize: '14px'}}>
                                 <Flex.Item style={{flex: 1}}>{showValue(child.order.price, 9, 4)}{oAbi.unitName(child.unit)}</Flex.Item>
                                 <Flex.Item style={{flex: 1}}>{showValue(child.order.value, 18, 4)} {bytes32ToToken(child.order.token)}</Flex.Item>
                             </Flex>
                         </div>
                     </Card.Body>
-                    <Card.Footer content={formatDate(new Date(child.order.updateTime * 1000))} extra={<span>
+                    <Card.Footer content={formatDate(new Date(child.order.updateTime * 1000))} extra={<span style={finished ? closeStyle : {}}>
                         <a onClick={() => {
                             if (orderType == 0) {
                                 oAbi.pkrDecrypt(self.state.pk, child.mcode, function (code1) {
