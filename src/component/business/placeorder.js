@@ -5,6 +5,7 @@ import oAbi from '../oabi'
 import {showValue} from "../common";
 import BigNumber from "bignumber.js";
 import Kyc from "../Kyc";
+import Select from 'react-select';
 
 export class PlaceOrder extends Kyc {
     constructor(props) {
@@ -68,6 +69,7 @@ export class PlaceOrder extends Kyc {
     }
 
     render() {
+        let self = this;
         let orderType = this.props.orderType;
         let showOrders;
         let price;
@@ -96,20 +98,37 @@ export class PlaceOrder extends Kyc {
         let tabList = oAbi.tokenList(this.state.unit).map((item, index) => {
             return <div className="item" key={index}>
                 <span style={this.state.token == item ? {fontWeight: 'bold', color: 'black'} : {}} onClick={() => {
-                    this.setState({token: item});
-                    this.init(this.state.mainPKr, item);
+                    self.setState({token: item});
+                    self._init(this.state.mainPKr, item);
                 }}>{item}</span>
             </div>
         });
+        let options = [];
+        oAbi.unitList().map((each, index) => {
+            options.push({value:each[0], label:each[1]});
+        })
         return (
             <div className="ui segment">
                 <div className="ui breadcrumb">
+
+                    {/*<Select*/}
+                    {/*    className={"test"}*/}
+                    {/*    onChange={(option)=>{*/}
+                    {/*        this.priceValue.value = "";*/}
+                    {/*        this.countValue.value = "";*/}
+                    {/*        this.minValue.value = "";*/}
+                    {/*        this.maxValue.value = "";*/}
+                    {/*        this._init(this.state.mainPKr, null, option.value);*/}
+                    {/*    }}*/}
+                    {/*    options={options}*/}
+                    {/*/>*/}
+
                     <div className="section">
                         <div className="ui dropdown" ref={el => this.dropdown = el}
                              onClick={() => {
-                                 this.setState({showSelect: true});
-                                 this.dropdown.className = "ui dropdown active visible";
-                                 this.menu.className = "menu transition visible";
+                                 self.setState({showSelect: true});
+                                 self.dropdown.className = "ui dropdown active visible";
+                                 self.menu.className = "menu transition visible";
                              }}>
                             <div className="text">{oAbi.unitName(this.state.unit)}</div>
                             <i className="dropdown icon"></i>
@@ -119,15 +138,15 @@ export class PlaceOrder extends Kyc {
                                     oAbi.unitList().map((each, index) => {
                                         return (
                                             <div className="item" onClick={(e) => {
-                                                this.dropdown.className = "ui dropdown ";
-                                                this.menu.className = "menu transition hidden";
-                                                this.setState({unit: each[0], showSelect: false});
+                                                self.dropdown.className = "ui dropdown ";
+                                                self.menu.className = "menu transition hidden";
+                                                self.setState({unit: each[0], showSelect: false});
 
-                                                this.priceValue.value = "";
-                                                this.countValue.value = "";
-                                                this.minValue.value = "";
-                                                this.maxValue.value = "";
-                                                this._init(this.state.mainPKr, null, each[0]);
+                                                self.priceValue.value = "";
+                                                self.countValue.value = "";
+                                                self.minValue.value = "";
+                                                self.maxValue.value = "";
+                                                self._init(this.state.mainPKr, null, each[0]);
                                                 e.stopPropagation();
                                             }}>{each[1]}
                                             </div>

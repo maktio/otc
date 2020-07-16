@@ -139,11 +139,12 @@ export class MarketOrders extends Kyc {
     }
 
     render() {
+        let self = this;
         let tabList = oAbi.tokenList(this.state.unit).map((item, index) => {
             return <div className="item" key={index}>
                 <span style={this.state.token == item ? {fontWeight: 'bold', color: 'black'} : {}} onClick={() => {
-                    this.setState({token: item});
-                    this.init(this.state.mainPKr, item);
+                    self.setState({token: item});
+                    self._init(this.state.mainPKr, item);
                 }}>{item
                 }</span>
             </div>
@@ -156,7 +157,7 @@ export class MarketOrders extends Kyc {
         } else {
             orders = this.state.sellOrders;
         }
-        let self = this;
+
         let showOrders = orders.map((item, index) => {
             let value = item.order.value - item.order.dealtValue - item.order.lockinValue;
             return (
