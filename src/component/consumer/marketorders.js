@@ -59,12 +59,15 @@ export class MarketOrders extends Kyc {
         }
 
         oAbi.businessOrderList(mainPKr, token, unit, false, function (orders) {
-            if (!orders.length) {
-                return;
-            }
+            console.log("businessOrderList", orders);
+
             let ids = [];
             let sellOrders = [];
             let buyOrders = [];
+            if (!orders.length) {
+                self.setState({sellOrders: sellOrders, buyOrders: buyOrders});
+                return;
+            }
 
             if (orders.length > 0) {
                 orders = orders.filter(function (item) {
@@ -331,22 +334,20 @@ export class MarketOrders extends Kyc {
                             <div className="text">{oAbi.unitName(this.state.unit)}</div>
                             <i className="dropdown icon"></i>
                             <div className="menu transition hidden" ref={el => this.menu = el}>
-                                {/*<div className="item" onClick={(e) => {*/}
-                                {/*    this.dropdown.className = "ui dropdown ";*/}
-                                {/*    this.menu.className = "menu transition hidden";*/}
-                                {/*    this.setState({unit: 0, showSelect: false});*/}
-                                {/*    this.init(this.state.mainPKr, null, 0);*/}
-                                {/*    e.stopPropagation()*/}
-                                {/*}}>CNY*/}
-                                {/*</div>*/}
-                                <div className="item" onClick={(e) => {
-                                    this.dropdown.className = "ui dropdown ";
-                                    this.menu.className = "menu transition hidden";
-                                    this.setState({unit: 0, showSelect: false});
-                                    this.init(this.state.mainPKr, null, 0);
-                                    e.stopPropagation();
-                                }}>USDT
-                                </div>
+                                {
+                                    oAbi.unitList().map((each, index) => {
+                                        return (
+                                            <div className="item" onClick={(e) => {
+                                                this.dropdown.className = "ui dropdown ";
+                                                this.menu.className = "menu transition hidden";
+                                                this.setState({unit: each[0], showSelect: false});
+                                                this._init(this.state.mainPKr, null, each[0]);
+                                                e.stopPropagation();
+                                            }}>{each[1]}
+                                            </div>
+                                        )
+                                    })
+                                }
                             </div>
                         </div>
                     </div>

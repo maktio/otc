@@ -71,11 +71,16 @@ export class PlaceOrder extends Kyc {
         let orderType = this.props.orderType;
         let showOrders;
         let price;
+        let disable = "USDT" == oAbi.unitName(this.state.unit);
         if (orderType == 0) {
-            price = 1;
+            if (disable) {
+                price = 1;
+            }
             showOrders = this.state.buyOrders;
         } else {
-            price = 1.003
+            if (disable) {
+                price = 1.003
+            }
             showOrders = this.state.sellOrders;
         }
 
@@ -109,22 +114,26 @@ export class PlaceOrder extends Kyc {
                             <div className="text">{oAbi.unitName(this.state.unit)}</div>
                             <i className="dropdown icon"></i>
                             <div className="menu transition hidden" ref={el => this.menu = el}>
-                                {/*<div className="item" onClick={(e) => {*/}
-                                {/*    this.dropdown.className = "ui dropdown ";*/}
-                                {/*    this.menu.className = "menu transition hidden";*/}
-                                {/*    this.setState({unit: 0, showSelect: false});*/}
-                                {/*    this.init(this.state.mainPKr, null, 0);*/}
-                                {/*    e.stopPropagation()*/}
-                                {/*}}>CNY*/}
-                                {/*</div>*/}
-                                <div className="item" onClick={(e) => {
-                                    this.dropdown.className = "ui dropdown ";
-                                    this.menu.className = "menu transition hidden";
-                                    this.setState({unit: 0, showSelect: false});
-                                    this.init(this.state.mainPKr, null, 0);
-                                    e.stopPropagation();
-                                }}>USDT
-                                </div>
+
+                                {
+                                    oAbi.unitList().map((each, index) => {
+                                        return (
+                                            <div className="item" onClick={(e) => {
+                                                this.dropdown.className = "ui dropdown ";
+                                                this.menu.className = "menu transition hidden";
+                                                this.setState({unit: each[0], showSelect: false});
+
+                                                this.priceValue.value = "";
+                                                this.countValue.value = "";
+                                                this.minValue.value = "";
+                                                this.maxValue.value = "";
+                                                this._init(this.state.mainPKr, null, each[0]);
+                                                e.stopPropagation();
+                                            }}>{each[1]}
+                                            </div>
+                                        )
+                                    })
+                                }
                             </div>
                         </div>
                     </div>
@@ -138,7 +147,7 @@ export class PlaceOrder extends Kyc {
 
                 <WhiteSpace/>
                 <div className="ui icon input" style={{width: "100%"}}>
-                    <input disabled={true} type="text" placeholder="Price" ref={el => this.priceValue = el}
+                    <input disabled={disable} type="text" placeholder="Price" ref={el => this.priceValue = el}
                            value={price}
                            onChange={(event) => {
                                let value = event.target.value;
@@ -173,7 +182,7 @@ export class PlaceOrder extends Kyc {
                 <Flex style={{textAlign: "center"}}>
                     <Flex.Item>
                         <div className="ui icon input" style={{width: "100%"}}>
-                            <input disabled={true} type="text" placeholder="MIN" style={{paddingRight: "10px"}}
+                            <input disabled={disable} type="text" placeholder="MIN" style={{paddingRight: "10px"}}
                                    ref={el => this.minValue = el} onChange={(event) => {
                                 let value = event.target.value;
                                 if (value) {
@@ -186,7 +195,7 @@ export class PlaceOrder extends Kyc {
                     </Flex.Item>
                     <Flex.Item>
                         <div className="ui icon input" style={{width: "100%"}}>
-                            <input disabled={true} type="text" placeholder="MAX" style={{paddingLeft: "10px"}}
+                            <input disabled={disable} type="text" placeholder="MAX" style={{paddingLeft: "10px"}}
                                    ref={el => this.maxValue = el} onChange={(event) => {
                                 let value = event.target.value;
                                 if (value) {

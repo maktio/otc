@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import 'semantic-ui-css/semantic.min.css';
 import oAbi from '../oabi'
-import {Brief, Button, Card, Flex, Icon, List, Modal, Radio, WhiteSpace} from "antd-mobile";
+import {Badge, Brief, Button, Card, Flex, Icon, List, Modal, Radio, WhiteSpace} from "antd-mobile";
 import {bytes32ToToken, showValue} from "../common";
 import BigNumber from 'bignumber.js'
 import language from '../language'
@@ -63,11 +63,17 @@ export class BOrders extends Component {
         oAbi.businessOrderList(mainPKr, "", 0, true, function (orders) {
             if (orders) {
                 orders.sort(function (a, b) {
-                    return b.order.timestemp - a.order.timestemp;
+                    return b.order.createTime - a.order.createTime;
                 });
                 self.setState({orders: orders});
             } else {
-                self.setState({orders: []});
+                let item = {
+                    order: {
+                        value: 2e18, dealtValue: 0, price: 1e10, orderType: 0,
+                        status: 0, token: "SUSD", unit: 0
+                    }, underwayCount: 1
+                }
+                self.setState({orders: [item]});
             }
         });
     }
@@ -87,15 +93,17 @@ export class BOrders extends Component {
                 status = item.order.status == 4 ? "已取消" : "已完成";
             }
 
+            let closeStyle={color:'#ddd'};
+
             return (
                 <div className="item" key={index}>
                     <Card>
                         <Card.Header
                             title={
-                                <span>{item.order.orderType == 0 ? language.e().order.buy : language.e().order.sell}{bytes32ToToken(item.order.token)}
+                                <span style={!underway ? closeStyle : {}}>{item.order.orderType == 0 ? language.e().order.buy : language.e().order.sell}{bytes32ToToken(item.order.token)}
                         </span>}
                             extra={
-                                <div className="ui breadcrumb">
+                                <div className="ui breadcrumb" style={!underway ? closeStyle : {}}>
                                     <div className="section">ID:{item.id}</div>
                                     <div className="divider"></div>
                                     <div className="section">{canCancel ? <a onClick={() => {
@@ -113,7 +121,7 @@ export class BOrders extends Component {
                             }
                         />
                         <Card.Body>
-                            <div>
+                            <div style={!underway ? closeStyle : {}}>
                                 <Flex>
                                     <Flex.Item>数量({bytes32ToToken(item.order.token)})</Flex.Item>
                                     <Flex.Item>价格({oAbi.unitName(item.order.unit)})</Flex.Item>
@@ -127,11 +135,15 @@ export class BOrders extends Component {
 
                             </div>
                         </Card.Body>
-                        <Card.Footer extra={<span>
-                            处理中订单数量
-                            <a onClick={() => {
+                        <Card.Footer extra={<span style={!underway ? closeStyle : {}}>
+
+                            <span onClick={() => {
                                 self.setState({orderId: item.id, orderType: item.order.orderType});
-                            }}> {item.underwayCount}</a>
+                            }}>处理中订单数量 {
+                                    item.underwayCount == 0 ? item.underwayCount :
+                                        <Badge text={item.underwayCount} overflowCount={100}/>
+                                }
+                            </span>
                         </span>}/>
                     </Card>
                 </div>
