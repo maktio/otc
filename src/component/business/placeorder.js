@@ -111,18 +111,6 @@ export class PlaceOrder extends Kyc {
             <div className="ui segment">
                 <div className="ui breadcrumb">
 
-                    {/*<Select*/}
-                    {/*    className={"test"}*/}
-                    {/*    onChange={(option)=>{*/}
-                    {/*        this.priceValue.value = "";*/}
-                    {/*        this.countValue.value = "";*/}
-                    {/*        this.minValue.value = "";*/}
-                    {/*        this.maxValue.value = "";*/}
-                    {/*        this._init(this.state.mainPKr, null, option.value);*/}
-                    {/*    }}*/}
-                    {/*    options={options}*/}
-                    {/*/>*/}
-
                     <div className="section">
                         <div className="ui dropdown" ref={el => this.dropdown = el}
                              onClick={() => {
@@ -146,7 +134,7 @@ export class PlaceOrder extends Kyc {
                                                 self.countValue.value = "";
                                                 self.minValue.value = "";
                                                 self.maxValue.value = "";
-                                                self._init(this.state.mainPKr, null, each[0]);
+                                                self._init(self.state.mainPKr, null, each[0]);
                                                 e.stopPropagation();
                                             }}>{each[1]}
                                             </div>

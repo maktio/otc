@@ -67,13 +67,7 @@ export class BOrders extends Component {
                 });
                 self.setState({orders: orders});
             } else {
-                let item = {
-                    order: {
-                        value: 2e18, dealtValue: 0, price: 1e10, orderType: 0,
-                        status: 0, token: "SUSD", unit: 0
-                    }, underwayCount: 1
-                }
-                self.setState({orders: [item]});
+                self.setState({orders: []});
             }
         });
     }

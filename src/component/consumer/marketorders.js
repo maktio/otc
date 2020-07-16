@@ -6,6 +6,7 @@ import BigNumber from "bignumber.js";
 import {showValue} from "../common";
 import language from '../language'
 import Kyc from "../Kyc";
+import Select from 'react-select';
 
 const alert = Modal.alert;
 
@@ -59,8 +60,6 @@ export class MarketOrders extends Kyc {
         }
 
         oAbi.businessOrderList(mainPKr, token, unit, false, function (orders) {
-            console.log("businessOrderList", orders);
-
             let ids = [];
             let sellOrders = [];
             let buyOrders = [];
@@ -248,6 +247,11 @@ export class MarketOrders extends Kyc {
             </Radio.RadioItem>
         });
 
+        let options = [];
+        oAbi.unitList().map((each, index) => {
+            options.push({value:each[0], label:each[1]});
+        })
+
         return (
             <div>
                 <Modal
@@ -325,6 +329,16 @@ export class MarketOrders extends Kyc {
 
                 <WhiteSpace/>
                 <div className="ui breadcrumb">
+
+                    {/*<Select*/}
+                    {/*    // className={"ui dropdown"}*/}
+                    {/*    onChange={(option)=>{*/}
+                    {/*        self._init(self.state.mainPKr, null, option.value);*/}
+                    {/*    }}*/}
+                    {/*    options={options}*/}
+                    {/*/>*/}
+
+
                     <div className="section">
                         <div className="ui dropdown" ref={el => this.dropdown = el}
                              onClick={() => {
