@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {WingBlank, SegmentedControl, NavBar, Icon, Tabs, Modal, WhiteSpace} from "antd-mobile";
+import {WingBlank, SegmentedControl, NavBar, Icon, Tabs, Modal, WhiteSpace, Flex} from "antd-mobile";
 import './App.css';
 import 'semantic-ui-css/semantic.min.css';
 import oAbi from './component/oabi'
@@ -120,19 +120,35 @@ class App extends Kyc {
         }
 
         return (
-            <WingBlank>
+            <div>
+                <WingBlank>
+                    <Flex>
+                        <Flex.Item>
+                             <span key={"0"} style={{fontSize: '12px'}} onClick={() => {
+                                 if (this.state.auditedStatus < 1) {
+                                     this.kyc(this.state.selectedIndex == 1);
+                                 }
+                             }}>{kycStatus}</span>
+                        </Flex.Item>
+                        <Flex.Item style={{textAlign: 'right'}}>
+                            <span key="2" onClick={this.changAccount.bind(this)}>{this.state.name}<Icon key="1"
+                                                                                                        type="iconaccount"
+                                                                                                        className="text-black"/></span>
+                        </Flex.Item>
+                    </Flex>
+                    <WhiteSpace/>
+                    <img src={require('./makt-banner.png')} width='100%' height='auto'/>
+                </WingBlank>
+
+                <WhiteSpace/>
                 <NavBar
                     mode="light"
-                    leftContent={[
-                        <span key={"0"} style={{fontSize:'12px'}} onClick={() => {
-                            if (this.state.auditedStatus < 1) {
-                                this.kyc(this.state.selectedIndex == 1);
-                            }
-                        }}>{kycStatus}</span>
-                    ]}
-                    rightContent={[
-                        <span key="2" onClick={this.changAccount.bind(this)}>{this.state.name}<Icon key="1" type="iconaccount" className="text-black" /></span>
-                    ]}
+                    // leftContent={[
+
+                    // ]}
+                    // rightContent={[
+                    //     <span key="2" onClick={this.changAccount.bind(this)}>{this.state.name}<Icon key="1" type="iconaccount" className="text-black" /></span>
+                    // ]}
                 >
                     <SegmentedControl
                         values={['个人', '商家']}
@@ -145,36 +161,40 @@ class App extends Kyc {
                     />
                 </NavBar>
 
-                <div>
-                    {
-                        this.state.selectedIndex == 0 ?
-                            <Tabs tabs={tabs0}
-                                  swipeable={false}
-                                  initialPage={0}
-                                  onChange={(tab, index) => {
-                                      this.setState({showType: tab.showType})
-                                  }}
-                            >
-                            </Tabs> :
-                            <Tabs tabs={tabs1}
-                                  swipeable={false}
-                                  initialPage={0}
-                                  onChange={(tab, index) => {
-                                      this.setState({showType: tab.showType})
-                                  }}
-                            >
-                            </Tabs>
-                    }
-                    {
-                        this.renderContent(this.state.showType)
-                    }
+                <WingBlank>
 
-                </div>
-                <WhiteSpace/>
-                {
-                    this.state.roleType > 0 && <AuditingList roleType={this.state.roleType} pk={this.state.pk}/>
-                }
-            </WingBlank>
+
+                    <div>
+                        {
+                            this.state.selectedIndex == 0 ?
+                                <Tabs tabs={tabs0}
+                                      swipeable={false}
+                                      initialPage={0}
+                                      onChange={(tab, index) => {
+                                          this.setState({showType: tab.showType})
+                                      }}
+                                >
+                                </Tabs> :
+                                <Tabs tabs={tabs1}
+                                      swipeable={false}
+                                      initialPage={0}
+                                      onChange={(tab, index) => {
+                                          this.setState({showType: tab.showType})
+                                      }}
+                                >
+                                </Tabs>
+                        }
+                        {
+                            this.renderContent(this.state.showType)
+                        }
+
+                    </div>
+                    <WhiteSpace/>
+                    {
+                        this.state.roleType > 0 && <AuditingList roleType={this.state.roleType} pk={this.state.pk}/>
+                    }
+                </WingBlank>
+            </div>
         )
     }
 }

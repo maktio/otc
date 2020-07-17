@@ -126,7 +126,7 @@ export class PlaceOrder extends Kyc {
                                 {
                                     oAbi.unitList().map((each, index) => {
                                         return (
-                                            <div className="item" onClick={(e) => {
+                                            <div key={index} className="item" onClick={(e) => {
                                                 self.dropdown.className = "ui dropdown ";
                                                 self.menu.className = "menu transition hidden";
                                                 self.setState({unit: each[0], showSelect: false});

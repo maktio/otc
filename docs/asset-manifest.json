@@ -1,21 +1,22 @@
 {
   "files": {
     "main.css": "./static/css/main.7664943a.chunk.css",
-    "main.js": "./static/js/main.48bf7e71.chunk.js",
+    "main.js": "./static/js/main.645b98fe.chunk.js",
     "runtime-main.js": "./static/js/runtime-main.403cc729.js",
-    "static/css/2.70d31e27.chunk.css": "./static/css/2.70d31e27.chunk.css",
-    "static/js/2.0b1d2783.chunk.js": "./static/js/2.0b1d2783.chunk.js",
+    "static/css/2.17c3e16e.chunk.css": "./static/css/2.17c3e16e.chunk.css",
+    "static/js/2.f8d18dbb.chunk.js": "./static/js/2.f8d18dbb.chunk.js",
     "index.html": "./index.html",
-    "precache-manifest.727d7d0f05f2bafa8bf3db72656ec5b4.js": "./precache-manifest.727d7d0f05f2bafa8bf3db72656ec5b4.js",
+    "precache-manifest.108eacab11e67b948b053b3c19abec9f.js": "./precache-manifest.108eacab11e67b948b053b3c19abec9f.js",
     "service-worker.js": "./service-worker.js",
-    "static/js/2.0b1d2783.chunk.js.LICENSE.txt": "./static/js/2.0b1d2783.chunk.js.LICENSE.txt",
-    "static/media/semantic.min.css": "./static/media/outline-icons.ef60a4f6.woff"
+    "static/js/2.f8d18dbb.chunk.js.LICENSE.txt": "./static/js/2.f8d18dbb.chunk.js.LICENSE.txt",
+    "static/media/semantic.min.css": "./static/media/outline-icons.ef60a4f6.woff",
+    "static/media/makt-banner.png": "./static/media/makt-banner.4bb5940d.png"
   },
   "entrypoints": [
     "static/js/runtime-main.403cc729.js",
-    "static/css/2.70d31e27.chunk.css",
-    "static/js/2.0b1d2783.chunk.js",
+    "static/css/2.17c3e16e.chunk.css",
+    "static/js/2.f8d18dbb.chunk.js",
     "static/css/main.7664943a.chunk.css",
-    "static/js/main.48bf7e71.chunk.js"
+    "static/js/main.645b98fe.chunk.js"
   ]
 }
