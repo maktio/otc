@@ -73,7 +73,9 @@ export class UserOrders extends Component {
                                     }
                                 },
                             ]);
-                    }}>{language.e().order.confirm}</a>
+                    }}>{
+                        orderType == 1 ? "请确定后付款" : "确定"
+                    }</a>
                     <div className="divider"></div>
                     <a className="section" onClick={() => {
                         alert(language.e().order.refuse, ""
@@ -85,7 +87,7 @@ export class UserOrders extends Component {
                                     }
                                 },
                             ]);
-                    }}>{language.e().order.refuse}</a>
+                    }}>{"拒绝"}</a>
                 </div>
             } else if (child.order.status == 2) {
                 let value = new BigNumber(child.order.price).multipliedBy(child.order.value).dividedBy(new BigNumber(10).pow(27)).toNumber();
