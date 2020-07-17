@@ -203,21 +203,23 @@ export class UserOrders extends Component {
                             }}>用户信息</a>
                             </div>
                             {
-                                orderType == 1 && <div>
-                                    <div className="divider">/</div>
-                                    <div className="active section">
-                                        <a onClick={() => {
-                                            let code2 = oAbi.code2(oAbi.code1(code));
-                                            let url = "https://ahoj.xyz/levelInfo/code2/" + code2 + "?lang=cn&pcindex" + child.order.payType;
-                                            Modal.alert('', <iframe src={url}
-                                                                    width="100%"
-                                                                    height={document.documentElement.clientHeight * 0.7}
-                                                                    display="initial"
-                                                                    position="relative"
-                                                                    frameBorder="no"
-                                            />);
-                                        }}>商家信息</a>
-                                    </div>
+                                orderType == 1 &&
+                                <div className="divider"> / </div>
+                            }
+                            {
+                                orderType == 1 &&
+                                <div className="active section">
+                                    <a onClick={() => {
+                                        let code2 = oAbi.code2(oAbi.code1(code));
+                                        let url = "https://ahoj.xyz/levelInfo/code2/" + code2 + "?lang=cn&pcindex" + child.order.payType;
+                                        Modal.alert('', <iframe src={url}
+                                                                width="100%"
+                                                                height={document.documentElement.clientHeight * 0.7}
+                                                                display="initial"
+                                                                position="relative"
+                                                                frameBorder="no"
+                                        />);
+                                    }}>商家信息</a>
                                 </div>
                             }
                         </div>
