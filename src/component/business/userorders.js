@@ -179,41 +179,49 @@ export class UserOrders extends Component {
                             </Flex>
                         </div>
                     </Card.Body>
-                    <Card.Footer content={formatDate(new Date(child.order.updateTime * 1000))} extra={<span style={finished ? closeStyle : {}}>
-                        <a onClick={() => {
-                            oAbi.pkrDecrypt(self.state.pk, child.mcode, function (code1) {
-                                if (oAbi.code2(code1) === child.hcode) {
-                                    let url;
-                                    if (orderType == 0) {
-                                        url = "https://ahoj.xyz/levelInfo/code1/" + code1 + "?lang=cn&pcindex" + child.order.payType;
-                                    } else {
-                                        let url = "https://ahoj.xyz/levelInfo/code1/" + code1 + "?lang=cn";
-                                    }
+                    <Card.Footer content={formatDate(new Date(child.order.updateTime * 1000))} extra={
+                        <div className="ui breadcrumb" style={finished ? closeStyle : {}}>
+                            <div className="section"><a onClick={() => {
+                                oAbi.pkrDecrypt(self.state.pk, child.mcode, function (code1) {
+                                    if (oAbi.code2(code1) === child.hcode) {
+                                        let url;
+                                        if (orderType == 0) {
+                                            url = "https://ahoj.xyz/levelInfo/code1/" + code1 + "?lang=cn&pcindex" + child.order.payType;
+                                        } else {
+                                            url = "https://ahoj.xyz/levelInfo/code1/" + code1 + "?lang=cn";
+                                        }
 
-                                    Modal.alert('', <iframe src={url}
-                                                            width="100%"
-                                                            height={document.documentElement.clientHeight * 0.7}
-                                                            display="initial"
-                                                            position="relative"
-                                                            frameBorder="no"
-                                    />);
-                                }
-                            });
-                        }}>用户信息</a>
-                        {
-                            orderType == 1 && <a onClick={() => {
-                                let code2 = oAbi.code2(oAbi.code1(code));
-                                let url = "https://ahoj.xyz/levelInfo/code2/" + code2 + "?lang=cn&pcindex" + child.order.payType;
-                                Modal.alert('', <iframe src={url}
-                                                        width="100%"
-                                                        height={document.documentElement.clientHeight * 0.7}
-                                                        display="initial"
-                                                        position="relative"
-                                                        frameBorder="no"
-                                />);
-                            }}>商家信息</a>
-                        }
-                    </span>}/>
+                                        Modal.alert('', <iframe src={url}
+                                                                width="100%"
+                                                                height={document.documentElement.clientHeight * 0.7}
+                                                                display="initial"
+                                                                position="relative"
+                                                                frameBorder="no"
+                                        />);
+                                    }
+                                });
+                            }}>用户信息</a>
+                            </div>
+                            {
+                                orderType == 1 && <div>
+                                    <div className="divider">/</div>
+                                    <div className="active section">
+                                        <a onClick={() => {
+                                            let code2 = oAbi.code2(oAbi.code1(code));
+                                            let url = "https://ahoj.xyz/levelInfo/code2/" + code2 + "?lang=cn&pcindex" + child.order.payType;
+                                            Modal.alert('', <iframe src={url}
+                                                                    width="100%"
+                                                                    height={document.documentElement.clientHeight * 0.7}
+                                                                    display="initial"
+                                                                    position="relative"
+                                                                    frameBorder="no"
+                                            />);
+                                        }}>商家信息</a>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }/>
                 </Card>
             </div>
 
