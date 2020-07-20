@@ -33,7 +33,8 @@ class App extends Kyc {
             pk: localStorage.getItem("PK"),
             mainPKr: localStorage.getItem("MAINPKR"),
             showType: 0,
-            origin: true
+            origin: true,
+            selectedIndex: 0,
         });
     }
 

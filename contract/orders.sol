@@ -126,8 +126,15 @@ library OrderPlatform {
 
     function refuse(DB storage self, uint256 userOrderId) internal {
         Types.UserOrder storage userOrder = self.userOrdersMap[userOrderId];
+
+        if(userOrder.status == Types.OrderStatus.confirmed) {
+            Types.BusinessOrder storage businessOrder = self.businessOrdersMap[userOrder.businessOrderId];
+            businessOrder.lockinValue = businessOrder.lockinValue.sub(userOrder.value);
+        }
+
         userOrder.status = Types.OrderStatus.refused;
         userOrder.updateTime = block.timestamp;
+
 
         removeRelationList(self, userOrder.businessOrderId, userOrderId);
     }
@@ -258,20 +265,24 @@ library OrderPlatform {
     function checkBOPOrder(DB storage self, address owner, uint256 userOrderId, Types.OrderStatus status) internal view returns(bool) {
         Types.UserOrder memory userOrder = self.userOrdersMap[userOrderId];
 
-        require(userOrder.status == status);
+        if(userOrder.status != status) {
+            return false;
+        }
 
         Types.BusinessOrder memory order = self.businessOrdersMap[userOrder.businessOrderId];
-        require(order.owner == owner);
-        require(self.relationsMap[userOrder.businessOrderId].contains[userOrderId]);
+        if(order.owner != owner) {
+            return false;
+        }
 
-        return true;
+        return self.relationsMap[userOrder.businessOrderId].contains[userOrderId];
     }
 
     function checkUOPOrder(DB storage self, address owner, uint256 userOrderId, Types.OrderStatus status) internal view returns(bool) {
         Types.UserOrder memory userOrder = self.userOrdersMap[userOrderId];
 
-        require(userOrder.owner == owner);
-        require(userOrder.status == status);
-        return true;
+        if(userOrder.owner == owner && userOrder.status == status ) {
+            return true;
+        }
+        return false;
     }
 }

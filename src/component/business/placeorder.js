@@ -13,7 +13,8 @@ export class PlaceOrder extends Kyc {
             sellOrders: [],
             buyOrders: [],
             token: oAbi.tokenList(0)[0],
-            unit: 0
+            unit: 0,
+            selectedIndex: 1,
         });
     }
 

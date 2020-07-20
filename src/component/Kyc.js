@@ -17,7 +17,6 @@ export default class Kyc extends Component {
             pcode: null,
             info:{},
             auditedStatus: 0,
-            selectedIndex: 0,
             modal:true
         }, state);
     }

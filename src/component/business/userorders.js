@@ -74,7 +74,7 @@ export class UserOrders extends Component {
                                 },
                             ]);
                     }}>{
-                        orderType == 1 ? "请确定后付款" : "确定"
+                        orderType == 0 ? "请确定后付款" : "确定"
                     }</a>
                     <div className="divider"></div>
                     <a className="section" onClick={() => {

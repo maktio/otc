@@ -25,7 +25,8 @@ export class MarketOrders extends Kyc {
             pkr: "",
             id: "",
             price: 0,
-            maxValue: 0
+            maxValue: 0,
+            selectedIndex: 0,
         });
     }
 

@@ -217,7 +217,7 @@ export class AuditingList extends Component {
                             {
                                 this.state.orderInfo && <Flex>
                                     <Flex.Item
-                                        style={{flex: 1}}>{this.state.orderInfo.orderType == 0 ? "买入" : "卖出"}</Flex.Item>
+                                        style={{flex: 1}}>{this.state.orderInfo.order.orderType == 0 ? "买入" : "卖出"}</Flex.Item>
                                     <Flex.Item
                                         style={{flex: 1}}>{showValue(this.state.orderInfo.order.price, 9, 4)} {oAbi.unitName(this.state.orderInfo.unit)}</Flex.Item>
                                     <Flex.Item
