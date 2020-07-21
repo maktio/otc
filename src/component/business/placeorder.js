@@ -191,7 +191,7 @@ export class PlaceOrder extends Kyc {
                 <Flex style={{textAlign: "center"}}>
                     <Flex.Item>
                         <div className="ui icon input" style={{width: "100%"}}>
-                            <input disabled={disable} type="text" placeholder="MIN" style={{paddingRight: "10px"}}
+                            <input type="text" placeholder="MIN" style={{paddingRight: "10px"}}
                                    ref={el => this.minValue = el} onChange={(event) => {
                                 let value = event.target.value;
                                 if (value) {
