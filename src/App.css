@@ -66,3 +66,9 @@
 .am-modal-transparent .am-modal-content .am-modal-body {
   padding: 0 0px 15px;
 }
+
+
+.am-card-footer-extra {
+  flex: unset !important;
+  text-align: right;
+}
