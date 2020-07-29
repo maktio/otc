@@ -53,7 +53,13 @@ export class PlaceOrder extends Kyc {
                     let sellOrders = [];
                     let buyOrders = [];
 
+                    orders.sort((a, b) => {
+                        return b.order.createTime - a.order.createTime;
+                    })
                     orders = orders.filter(function (item) {
+                        if (item.id == 4 || item.id == 3) {
+                            return false;
+                        }
                         return item.order.status == 0 && new BigNumber(item.order.value).comparedTo(new BigNumber(item.order.dealtValue)) > 0;
                     });
 
